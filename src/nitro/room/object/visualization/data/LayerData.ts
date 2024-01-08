@@ -1,11 +1,11 @@
-import { BLEND_MODES } from '@pixi/constants';
+import { BLEND_MODES } from 'pixi.js';
 
 export class LayerData
 {
     public static DEFAULT_COUNT: number = 0;
     public static DEFAULT_DIRECTION: number = 0;
     public static DEFAULT_TAG: string = '';
-    public static DEFAULT_INK: number = BLEND_MODES.NORMAL;
+    public static DEFAULT_BLEND_MODE: BLEND_MODES = 'normal';
     public static DEFAULT_ALPHA: number = 255;
     public static DEFAULT_IGNORE_MOUSE: boolean = false;
     public static DEFAULT_XOFFSET: number = 0;
@@ -13,7 +13,7 @@ export class LayerData
     public static DEFAULT_ZOFFSET: number = 0;
 
     private _tag: string;
-    private _ink: number;
+    private _blendMode: BLEND_MODES;
     private _alpha: number;
     private _ignoreMouse: boolean;
     private _xOffset: number;
@@ -23,7 +23,7 @@ export class LayerData
     constructor()
     {
         this._tag = LayerData.DEFAULT_TAG;
-        this._ink = LayerData.DEFAULT_INK;
+        this._blendMode = LayerData.DEFAULT_BLEND_MODE;
         this._alpha = LayerData.DEFAULT_ALPHA;
         this._ignoreMouse = LayerData.DEFAULT_IGNORE_MOUSE;
         this._xOffset = LayerData.DEFAULT_XOFFSET;
@@ -36,7 +36,7 @@ export class LayerData
         if(!layer) return;
 
         this._tag = layer.tag;
-        this._ink = layer.ink;
+        this._blendMode = layer.blendMode;
         this._alpha = layer.alpha;
         this._ignoreMouse = layer.ignoreMouse;
         this._xOffset = layer.xOffset;
@@ -54,14 +54,14 @@ export class LayerData
         this._tag = tag;
     }
 
-    public get ink(): number
+    public get blendMode(): BLEND_MODES
     {
-        return this._ink;
+        return this._blendMode;
     }
 
-    public set ink(ink: number)
+    public set blendMode(blendMode: BLEND_MODES)
     {
-        this._ink = ink;
+        this._blendMode = blendMode;
     }
 
     public get alpha(): number

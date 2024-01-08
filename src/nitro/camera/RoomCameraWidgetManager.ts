@@ -1,6 +1,4 @@
-import { Texture } from '@pixi/core';
-import { Container } from '@pixi/display';
-import { ColorMatrix, ColorMatrixFilter } from '@pixi/filter-color-matrix';
+import { BLEND_MODES, ColorMatrix, ColorMatrixFilter, Container, Filter, Texture } from 'pixi.js';
 import { IRoomCameraWidgetEffect, IRoomCameraWidgetManager, IRoomCameraWidgetSelectedEffect, NitroConfiguration } from '../../api';
 import { NitroEventDispatcher, RoomCameraWidgetManagerEvent } from '../../events';
 import { NitroSprite, TextureUtils } from '../../pixi-proxy';
@@ -24,7 +22,7 @@ export class RoomCameraWidgetManager implements IRoomCameraWidgetManager
         this._isLoaded = true;
 
         const imagesUrl = NitroConfiguration.getValue<string>('image.library.url') + 'Habbo-Stories/';
-        const effects = NitroConfiguration.getValue<{ name: string, colorMatrix?: ColorMatrix, minLevel: number, blendMode?: number, enabled: boolean }[]>('camera.available.effects');
+        const effects = NitroConfiguration.getValue<{ name: string, colorMatrix?: ColorMatrix, minLevel: number, blendMode?: BLEND_MODES, enabled: boolean }[]>('camera.available.effects');
 
         for(const effect of effects)
         {
@@ -72,7 +70,7 @@ export class RoomCameraWidgetManager implements IRoomCameraWidgetManager
 
                 if(!sprite.filters) sprite.filters = [];
 
-                sprite.filters.push(filter);
+                (sprite.filters as Filter[]).push(filter);
             }
             else
             {

@@ -1,4 +1,4 @@
-﻿import { RenderTexture } from '@pixi/core';
+﻿import { Texture } from 'pixi.js';
 import { IDisposable, IGraphicAssetCollection, IRoomGeometry, IVector3D, Vector3d } from '../../../../../../../api';
 import { PlaneTextureCache } from '../../../../../../../pixi-proxy';
 import { PlaneVisualizationAnimationLayer } from '../animated';
@@ -122,7 +122,7 @@ export class PlaneVisualization
         return this._layers as PlaneVisualizationLayer[];
     }
 
-    public render(planeId: string, textureCache: PlaneTextureCache, canvas: RenderTexture, width: number, height: number, normal: IVector3D, useTexture: boolean, offsetX: number = 0, offsetY: number = 0, maxX: number = 0, maxY: number = 0, dimensionX: number = 0, dimensionY: number = 0, timeSinceStartMs: number = 0): RenderTexture
+    public render(planeId: string, textureCache: PlaneTextureCache, canvas: Texture, width: number, height: number, normal: IVector3D, useTexture: boolean, offsetX: number = 0, offsetY: number = 0, maxX: number = 0, maxY: number = 0, dimensionX: number = 0, dimensionY: number = 0, timeSinceStartMs: number = 0): Texture
     {
         if(width < 1) width = 1;
 
@@ -132,7 +132,7 @@ export class PlaneVisualization
 
         this._isCached = true;
 
-        const bitmap = textureCache.createAndFillRenderTexture(width, height, planeId);
+        const bitmap = textureCache.createAndFillRenderTexture(width, height, planeId) as Texture;
 
         this._cachedBitmapNormal.assign(normal);
 

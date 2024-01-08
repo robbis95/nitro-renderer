@@ -1,8 +1,6 @@
-import { Matrix, RenderTexture, Texture } from '@pixi/core';
-import { AlphaFilter } from '@pixi/filter-alpha';
-import { Graphics } from '@pixi/graphics';
+import { AlphaFilter, Graphics, Matrix, Point, Sprite, Texture } from 'pixi.js';
 import { AdvancedMap, IAdvancedMap, IGraphicAsset, IParticleSystem, IRoomObjectSprite } from '../../../../../api';
-import { NitroPoint, NitroSprite, PixiApplicationProxy } from '../../../../../pixi-proxy';
+import { TextureUtils } from '../../../../../pixi-proxy';
 import { Vector3D } from '../../../../avatar';
 import { FurnitureAnimatedVisualization } from './FurnitureAnimatedVisualization';
 import { FurnitureParticleSystemEmitter } from './FurnitureParticleSystemEmitter';
@@ -15,7 +13,7 @@ export class FurnitureParticleSystem
     private _canvasId: number = -1;
     private _offsetY: number;
     private _currentEmitter: FurnitureParticleSystemEmitter;
-    private _canvasTexture: RenderTexture;
+    private _canvasTexture: Texture;
     private _roomSprite: IRoomObjectSprite;
     private _hasIgnited: boolean = false;
     private _centerX: number = 0;
@@ -28,7 +26,7 @@ export class FurnitureParticleSystem
     private _translationMatrix: Matrix;
     private _blend: number = 1;
     private _bgColor: number = 0xFF000000;
-    private _emptySprite: NitroSprite;
+    private _emptySprite: Sprite;
     private _isDone: boolean = false;
 
     constructor(visualization: FurnitureAnimatedVisualization)
@@ -182,35 +180,28 @@ export class FurnitureParticleSystem
                         this._translationMatrix.identity();
                         this._translationMatrix.translate((tx + asset.offsetX), (ty + asset.offsetY));
 
-                        const sprite = new NitroSprite(asset.texture);
+                        const sprite = new Sprite(asset.texture);
 
                         this._particleColorTransform.alpha = particle.alphaMultiplier;
 
                         sprite.filters = [this._particleColorTransform];
 
-                        PixiApplicationProxy.instance.renderer.render(sprite, {
-                            renderTexture: this._canvasTexture,
-                            transform: this._translationMatrix,
-                            clear: false
-                        });
+                        TextureUtils.writeToTexture(sprite, this._canvasTexture, false, this._translationMatrix);
                     }
                     else
                     {
-                        const point = new NitroPoint((tx + asset.offsetX), (ty + asset.offsetY));
-                        const sprite = new NitroSprite(asset.texture);
+                        const point = new Point((tx + asset.offsetX), (ty + asset.offsetY));
+                        const sprite = new Sprite(asset.texture);
 
                         sprite.x = point.x;
                         sprite.y = point.y;
 
-                        PixiApplicationProxy.instance.renderer.render(sprite, {
-                            renderTexture: this._canvasTexture,
-                            clear: false
-                        });
+                        TextureUtils.writeToTexture(sprite, this._canvasTexture, false);
                     }
                 }
                 else
                 {
-                    const sprite = new NitroSprite(Texture.WHITE);
+                    const sprite = new Sprite(Texture.WHITE);
 
                     sprite.tint = 0xFFFFFF;
                     sprite.x = (tx - 1);
@@ -218,10 +209,7 @@ export class FurnitureParticleSystem
                     sprite.width = 2;
                     sprite.height = 2;
 
-                    PixiApplicationProxy.instance.renderer.render(sprite, {
-                        renderTexture: this._canvasTexture,
-                        clear: false
-                    });
+                    TextureUtils.writeToTexture(sprite, this._canvasTexture, false);
                 }
             }
 
@@ -309,24 +297,18 @@ export class FurnitureParticleSystem
     {
         if(!this._emptySprite)
         {
-            this._emptySprite = new NitroSprite(Texture.EMPTY);
+            this._emptySprite = new Sprite(Texture.EMPTY);
 
             this._emptySprite.alpha = 0;
         }
 
         if(!this._canvasTexture)
         {
-            this._canvasTexture = RenderTexture.create({
-                width: this._roomSprite.width,
-                height: this._roomSprite.height
-            });
+            this._canvasTexture = TextureUtils.createTexture(this._roomSprite.width, this._roomSprite.height);
         }
         else
         {
-            PixiApplicationProxy.instance.renderer.render(this._emptySprite, {
-                renderTexture: this._canvasTexture,
-                clear: true
-            });
+            TextureUtils.writeToTexture(this._emptySprite, this._canvasTexture, true);
         }
     }
 }

@@ -1,10 +1,6 @@
-import { BaseTexture, Texture } from '@pixi/core';
-import { decompressFrames, parseGIF } from 'gifuct-js';
 import { GetAssetManager, IAssetData, IRoomGeometry, MapDataType, MouseEventType, RoomObjectVariable, RoomWidgetEnumItemExtradataParameter } from '../../../../../api';
 import { RoomObjectRoomAdEvent, RoomSpriteMouseEvent } from '../../../../../events';
-import { RoomObjectUpdateMessage } from '../../../../../room';
-import { Nitro } from '../../../../Nitro';
-import { ObjectAdUpdateMessage, ObjectDataUpdateMessage } from '../../../messages';
+import { ObjectAdUpdateMessage, ObjectDataUpdateMessage, RoomObjectUpdateMessage } from '../../../messages';
 import { FurnitureLogic } from './FurnitureLogic';
 
 export class FurnitureRoomBrandingLogic extends FurnitureLogic
@@ -145,92 +141,28 @@ export class FurnitureRoomBrandingLogic extends FurnitureLogic
 
         if(!imageUrl || (imageUrl === '') || (imageStatus === 1)) return;
 
-        if(imageUrl.endsWith('.gif'))
+        const asset = GetAssetManager();
+
+        if(!asset) return;
+
+        const texture = asset.getTexture(imageUrl);
+
+        if(!texture)
         {
-            this.object.model.setValue(RoomObjectVariable.FURNITURE_BRANDING_IS_ANIMATED, true);
+            const status = await asset.downloadAsset(imageUrl);
 
-            fetch(imageUrl)
-                .then(resp => resp.arrayBuffer())
-                .then(buff => parseGIF(buff))
-                .then(gif =>
-                {
-                    const width = gif.lsd.width;
-                    const height = gif.lsd.height;
-                    const wh = width * height;
-                    const frames = decompressFrames(gif, false);
-                    const textures = [];
-                    const durations = [];
-
-                    let frame = new Uint8Array(wh * 4);
-
-                    for(let ind = 0; ind < frames.length; ind++)
-                    {
-                        if(ind > 0) frame = frame.slice(0);
-
-                        const pixels = frames[ind].pixels;
-                        const colorTable = frames[ind].colorTable;
-                        const trans = frames[ind].transparentIndex;
-                        const dims = frames[ind].dims;
-
-                        for(let j = 0; j < dims.height; j++)
-                        {
-                            for(let i = 0; i < dims.width; i++)
-                            {
-                                const pixel = pixels[j * dims.width + i];
-                                const coord = (j + dims.top) * width + (i + dims.left);
-
-                                if(trans !== pixel)
-                                {
-                                    const c = colorTable[pixel];
-
-                                    frame[4 * coord] = c[0];
-                                    frame[4 * coord + 1] = c[1];
-                                    frame[4 * coord + 2] = c[2];
-                                    frame[4 * coord + 3] = 255;
-                                }
-                            }
-                        }
-
-                        const baseTexture = BaseTexture.fromBuffer(frame, width, height);
-
-                        textures.push(new Texture(baseTexture));
-                        durations.push(frames[ind].delay);
-                    }
-
-                    Nitro.instance.roomEngine.roomContentLoader.createGifCollection(imageUrl, textures, durations);
-
-                    this.processUpdateMessage(new ObjectAdUpdateMessage(ObjectAdUpdateMessage.IMAGE_LOADED));
-                })
-                .catch(error =>
-                {
-                    this.processUpdateMessage(new ObjectAdUpdateMessage(ObjectAdUpdateMessage.IMAGE_LOADING_FAILED));
-                });
-        }
-        else
-        {
-            const asset = GetAssetManager();
-
-            if(!asset) return;
-
-            const texture = asset.getTexture(imageUrl);
-
-            if(!texture)
+            if(!status)
             {
-                const status = await asset.downloadAsset(imageUrl);
-
-                if(!status)
-                {
-                    this.processUpdateMessage(new ObjectAdUpdateMessage(ObjectAdUpdateMessage.IMAGE_LOADING_FAILED));
-                }
-                else
-                {
-                    this.processUpdateMessage(new ObjectAdUpdateMessage(ObjectAdUpdateMessage.IMAGE_LOADED));
-                }
-
-                return;
+                this.processUpdateMessage(new ObjectAdUpdateMessage(ObjectAdUpdateMessage.IMAGE_LOADING_FAILED));
+            }
+            else
+            {
+                this.processUpdateMessage(new ObjectAdUpdateMessage(ObjectAdUpdateMessage.IMAGE_LOADED));
             }
 
-            this.processUpdateMessage(new ObjectAdUpdateMessage(ObjectAdUpdateMessage.IMAGE_LOADED));
+            return;
         }
+
+        this.processUpdateMessage(new ObjectAdUpdateMessage(ObjectAdUpdateMessage.IMAGE_LOADED));
     }
 }

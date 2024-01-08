@@ -1,5 +1,5 @@
 ﻿import { IMessageDataWrapper, IObjectData } from '../../../../../../api';
-import { GetTickerTime } from '../../../../../../pixi-proxy';
+import { GetTickerTime } from '../../../../../../common';
 import { FurnitureDataParser } from '../../room';
 import { IFurnitureItemData } from '../furniture';
 

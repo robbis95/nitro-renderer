@@ -1,5 +1,4 @@
-import { SCALE_MODES } from '@pixi/constants';
-import { Texture } from '@pixi/core';
+import { Assets, Texture, TextureSource } from 'pixi.js';
 import { IsometricImageFurniVisualization } from './IsometricImageFurniVisualization';
 
 export class FurnitureDynamicThumbnailVisualization extends IsometricImageFurniVisualization
@@ -26,19 +25,18 @@ export class FurnitureDynamicThumbnailVisualization extends IsometricImageFurniV
 
                 if(this._cachedUrl && (this._cachedUrl !== ''))
                 {
-                    const image = new Image();
+                    Assets
+                        .load(thumbnailUrl)
+                        .then((asset: TextureSource) =>
+                        {
+                            asset.scaleMode = 'linear';
 
-                    image.src = thumbnailUrl;
-                    image.crossOrigin = '*';
-
-                    image.onload = () =>
-                    {
-                        const texture = Texture.from(image);
-
-                        texture.baseTexture.scaleMode = SCALE_MODES.LINEAR;
-
-                        this.setThumbnailImages(texture);
-                    };
+                            this.setThumbnailImages(Texture.from(asset));
+                        })
+                        .catch(err =>
+                        {
+                            console.log(err);
+                        });
                 }
                 else
                 {

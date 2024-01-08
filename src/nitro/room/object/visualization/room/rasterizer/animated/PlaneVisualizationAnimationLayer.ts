@@ -1,7 +1,6 @@
-﻿import { RenderTexture } from '@pixi/core';
-import { Sprite } from '@pixi/sprite';
+﻿import { Sprite, Texture } from 'pixi.js';
 import { IDisposable, IGraphicAssetCollection, IVector3D } from '../../../../../../../api';
-import { PlaneTextureCache } from '../../../../../../../pixi-proxy';
+import { PlaneTextureCache, TextureUtils } from '../../../../../../../pixi-proxy';
 import { AnimationItem } from './AnimationItem';
 
 export class PlaneVisualizationAnimationLayer implements IDisposable
@@ -55,7 +54,7 @@ export class PlaneVisualizationAnimationLayer implements IDisposable
     {
     }
 
-    public render(textureCache: PlaneTextureCache, canvas: RenderTexture, width: number, height: number, normal: IVector3D, offsetX: number, offsetY: number, maxX: number, maxY: number, dimensionX: number, dimensionY: number, timeSinceStartMs: number): RenderTexture
+    public render(textureCache: PlaneTextureCache, canvas: Texture, width: number, height: number, normal: IVector3D, offsetX: number, offsetY: number, maxX: number, maxY: number, dimensionX: number, dimensionY: number, timeSinceStartMs: number): Texture
     {
         if(((maxX > 0) && (maxY > 0)))
         {
@@ -80,7 +79,7 @@ export class PlaneVisualizationAnimationLayer implements IDisposable
 
                             sprite.position.set(point.x, point.y);
 
-                            textureCache.writeToRenderTexture(sprite, canvas, false);
+                            TextureUtils.writeToTexture(sprite, canvas, false);
                         }
 
                         if(((point.x - maxX) > -(item.bitmapData.width)) && ((point.x - maxX) < canvas.width) && (point.y > -(item.bitmapData.height)) && (point.y < canvas.height))
@@ -89,7 +88,7 @@ export class PlaneVisualizationAnimationLayer implements IDisposable
 
                             sprite.position.set((point.x - maxX), point.y);
 
-                            textureCache.writeToRenderTexture(sprite, canvas, false);
+                            TextureUtils.writeToTexture(sprite, canvas, false);
                         }
 
                         if((point.x > -(item.bitmapData.width)) && (point.x < canvas.width) && ((point.y - maxY) > -(item.bitmapData.height)) && ((point.y - maxY) < canvas.height))
@@ -98,7 +97,7 @@ export class PlaneVisualizationAnimationLayer implements IDisposable
 
                             sprite.position.set(point.x, (point.y - maxY));
 
-                            textureCache.writeToRenderTexture(sprite, canvas, false);
+                            TextureUtils.writeToTexture(sprite, canvas, false);
                         }
 
                         if(((point.x - maxX) > -(item.bitmapData.width)) && ((point.x - maxX) < canvas.width) && ((point.y - maxY) > -(item.bitmapData.height)) && ((point.y - maxY) < canvas.height))
@@ -107,7 +106,7 @@ export class PlaneVisualizationAnimationLayer implements IDisposable
 
                             sprite.position.set((point.x - maxX), (point.y - maxY));
 
-                            textureCache.writeToRenderTexture(sprite, canvas, false);
+                            TextureUtils.writeToTexture(sprite, canvas, false);
                         }
                     }
                 }

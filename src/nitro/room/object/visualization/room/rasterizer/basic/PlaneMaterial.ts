@@ -1,4 +1,4 @@
-﻿import { RenderTexture } from '@pixi/core';
+﻿import { Texture } from 'pixi.js';
 import { IVector3D } from '../../../../../../../api';
 import { PlaneTextureCache } from '../../../../../../../pixi-proxy';
 import { PlaneMaterialCellMatrix } from './PlaneMaterialCellMatrix';
@@ -77,7 +77,7 @@ export class PlaneMaterial
         return null;
     }
 
-    public render(planeId: string, textureCache: PlaneTextureCache, canvas: RenderTexture, width: number, height: number, normal: IVector3D, useTexture: boolean, offsetX: number, offsetY: number, topAlign: boolean): RenderTexture
+    public render(planeId: string, textureCache: PlaneTextureCache, canvas: Texture, width: number, height: number, normal: IVector3D, useTexture: boolean, offsetX: number, offsetY: number, topAlign: boolean): Texture
     {
         if(width < 1) width = 1;
 

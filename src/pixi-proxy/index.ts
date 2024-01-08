@@ -1,7 +1,3 @@
-export * from './CopyChannelFilter';
-export * from './GetTicker';
-export * from './GetTickerFPS';
-export * from './GetTickerTime';
 export * from './INitroPoint';
 export * from './NitroAlphaFilter';
 export * from './NitroBaseTexture';
@@ -12,8 +8,5 @@ export * from './NitroRectangle';
 export * from './NitroRenderTexture';
 export * from './NitroSprite';
 export * from './NitroTexture';
-export * from './PaletteMapFilter';
-export * from './PixiApplicationProxy';
 export * from './RoomTextureUtils';
 export * from './TextureUtils';
-export * from './adjustment-filter';

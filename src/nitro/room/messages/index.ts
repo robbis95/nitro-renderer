@@ -38,3 +38,4 @@ export * from './ObjectSelectedMessage';
 export * from './ObjectStateUpdateMessage';
 export * from './ObjectTileCursorUpdateMessage';
 export * from './ObjectVisibilityUpdateMessage';
+export * from './RoomObjectUpdateMessage';

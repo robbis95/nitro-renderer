@@ -1,4 +1,4 @@
-import { Point } from '@pixi/core';
+import { Point } from 'pixi.js';
 import { AvatarDirectionAngle, IActionDefinition, IActiveActionData, IAssetAnimation, IAssetManager, IAvatarFigureContainer, IAvatarImage, IAvatarRenderManager, IFigureData, IFigurePartSet, IPartColor, IStructureData } from '../../api';
 import { EventDispatcher } from '../../events';
 import { AvatarImagePartContainer } from './AvatarImagePartContainer';

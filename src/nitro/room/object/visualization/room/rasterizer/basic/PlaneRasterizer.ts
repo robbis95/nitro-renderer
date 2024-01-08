@@ -1,7 +1,7 @@
-﻿import { Point, RenderTexture, Resource, Texture } from '@pixi/core';
+﻿import { Point, Texture } from 'pixi.js';
 import { IAssetPlaneMaterial, IAssetPlaneMaterialCellColumn, IAssetPlaneTexture, IAssetPlaneVisualization, IAssetPlaneVisualizationData, IAssetPlaneVisualizationLayer, IGraphicAsset, IGraphicAssetCollection, IRoomGeometry, IVector3D, Vector3d } from '../../../../../../../api';
 import { PlaneTextureCache } from '../../../../../../../pixi-proxy';
-import { Rasterizer, RoomGeometry } from '../../../../../../../room';
+import { Rasterizer, RoomGeometry } from '../../../../../utils';
 import { PlaneBitmapData } from '../../utils';
 import { IPlaneRasterizer } from '../IPlaneRasterizer';
 import { FloorPlane } from './FloorPlane';
@@ -247,15 +247,11 @@ export class PlaneRasterizer implements IPlaneRasterizer
 
                                 if(texture)
                                 {
-                                    let newTexture: Texture<Resource> = texture;
+                                    let newTexture: Texture = texture;
 
                                     if(asset.flipH)
                                     {
                                         newTexture = Rasterizer.getFlipHBitmapData(texture);
-                                    }
-                                    else
-                                    {
-                                        newTexture = newTexture.clone();
                                     }
 
                                     plane.addBitmap(newTexture, normalMinX, normalMaxX, normalMinY, normalMaxY, assetName);
@@ -584,7 +580,7 @@ export class PlaneRasterizer implements IPlaneRasterizer
         }
     }
 
-    public render(planeId: string, textureCache: PlaneTextureCache, canvas: RenderTexture, id: string, width: number, height: number, size: number, normal: IVector3D, useTexture: boolean, offsetX: number = 0, offsetY: number = 0, maxX: number = 0, maxY: number = 0, timeSinceStartMs: number = 0): PlaneBitmapData
+    public render(planeId: string, textureCache: PlaneTextureCache, canvas: Texture, id: string, width: number, height: number, size: number, normal: IVector3D, useTexture: boolean, offsetX: number = 0, offsetY: number = 0, maxX: number = 0, maxY: number = 0, timeSinceStartMs: number = 0): PlaneBitmapData
     {
         return null;
     }

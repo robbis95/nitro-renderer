@@ -1,9 +1,7 @@
-import { Rectangle, RenderTexture, Texture } from '@pixi/core';
-import { Container } from '@pixi/display';
-import { ColorMatrixFilter } from '@pixi/filter-color-matrix';
-import { Sprite } from '@pixi/sprite';
+import { ColorMatrixFilter, Container, Filter, Rectangle, Sprite, Texture } from 'pixi.js';
 import { AdvancedMap, AvatarAction, AvatarDirectionAngle, AvatarScaleType, AvatarSetType, IActionDefinition, IActiveActionData, IAdvancedMap, IAnimationLayerData, IAvatarDataContainer, IAvatarEffectListener, IAvatarFigureContainer, IAvatarImage, IGraphicAsset, IPartColor, ISpriteDataContainer } from '../../api';
-import { GetTickerTime, NitroSprite, PaletteMapFilter, PixiApplicationProxy, TextureUtils } from '../../pixi-proxy';
+import { GetTickerTime, PaletteMapFilter } from '../../common';
+import { TextureUtils } from '../../pixi-proxy';
 import { AvatarFigureContainer } from './AvatarFigureContainer';
 import { AvatarStructure } from './AvatarStructure';
 import { EffectAssetDownloadManager } from './EffectAssetDownloadManager';
@@ -35,8 +33,8 @@ export class AvatarImage implements IAvatarImage, IAvatarEffectListener
     protected _figure: AvatarFigureContainer;
     protected _avatarSpriteData: IAvatarDataContainer;
     protected _actions: ActiveActionData[];
-    protected _image: RenderTexture;
-    protected _reusableTexture: RenderTexture;
+    protected _image: Texture;
+    protected _reusableTexture: Texture;
 
     private _defaultAction: IActiveActionData;
     private _frameCounter: number = 0;
@@ -49,7 +47,7 @@ export class AvatarImage implements IAvatarImage, IAvatarEffectListener
     private _sortedActions: IActiveActionData[];
     private _lastActionsString: string;
     private _currentActionsString: string;
-    private _fullImageCache: IAdvancedMap<string, RenderTexture>;
+    private _fullImageCache: IAdvancedMap<string, Texture>;
     private _fullImageCacheSize: number = 5;
     protected _isCachedImage: boolean = false;
     private _useFullImageCache: boolean = false;
@@ -294,7 +292,7 @@ export class AvatarImage implements IAvatarImage, IAvatarEffectListener
         }
     }
 
-    public getImage(setType: string, hightlight: boolean, scale: number = 1, cache: boolean = true): RenderTexture
+    public getImage(setType: string, hightlight: boolean, scale: number = 1, cache: boolean = true): Texture
     {
         if(!this._changes) return this._image;
 
@@ -378,34 +376,39 @@ export class AvatarImage implements IAvatarImage, IAvatarEffectListener
         {
             if(!container.filters) container.filters = [];
 
-            if(this._avatarSpriteData.colorTransform) container.filters.push(this._avatarSpriteData.colorTransform);
+            const filters: Filter[] = container.filters as Filter[];
+
+            if(this._avatarSpriteData.colorTransform) filters.push(this._avatarSpriteData.colorTransform);
 
             if(this._avatarSpriteData.paletteIsGrayscale)
             {
                 this.convertToGrayscale(container);
 
-                container.filters.push(new PaletteMapFilter(this._avatarSpriteData.reds, PaletteMapFilter.CHANNEL_RED));
+                filters.push(new PaletteMapFilter(this._avatarSpriteData.reds, PaletteMapFilter.CHANNEL_RED));
             }
         }
 
         if(!cache)
         {
-            return TextureUtils.generateTexture(container, new Rectangle(0, 0, avatarCanvas.width, avatarCanvas.height));
+            return TextureUtils.generateTexture({
+                target: container,
+                frame: new Rectangle(0, 0, avatarCanvas.width, avatarCanvas.height)
+            });
         }
 
         if(this._reusableTexture)
         {
-            PixiApplicationProxy.instance.renderer.render(container, {
-                renderTexture: this._reusableTexture,
-                clear: true
-            });
+            TextureUtils.writeToTexture(container, this._reusableTexture, true);
 
             //@ts-ignore
-            this._reusableTexture.baseTexture.hitMap = null;
+            this._reusableTexture.hitMap = null;
         }
         else
         {
-            this._reusableTexture = TextureUtils.generateTexture(container, new Rectangle(0, 0, avatarCanvas.width, avatarCanvas.height));
+            this._reusableTexture = TextureUtils.generateTexture({
+                target: container,
+                frame: new Rectangle(0, 0, avatarCanvas.width, avatarCanvas.height)
+            });
         }
 
         if(!this._reusableTexture) return null;
@@ -426,7 +429,7 @@ export class AvatarImage implements IAvatarImage, IAvatarEffectListener
         return this._image;
     }
 
-    public applyPalette(texture: RenderTexture, reds: number[] = [], greens: number[] = [], blues: number[] = []): RenderTexture
+    public applyPalette(texture: Texture, reds: number[] = [], greens: number[] = [], blues: number[] = []): Texture
     {
         const textureCanvas = TextureUtils.generateCanvas(texture);
         const textureCtx = textureCanvas.getContext('2d');
@@ -469,10 +472,7 @@ export class AvatarImage implements IAvatarImage, IAvatarEffectListener
 
         const newTexture = new Sprite(Texture.from(textureCanvas));
 
-        PixiApplicationProxy.instance.renderer.render(newTexture, {
-            renderTexture: texture,
-            clear: true
-        });
+        TextureUtils.writeToTexture(newTexture, texture, true);
 
         return texture;
     }
@@ -488,8 +488,8 @@ export class AvatarImage implements IAvatarImage, IAvatarEffectListener
         if(!avatarCanvas) return null;
 
         const setTypes = this.getBodyParts(setType, this._mainAction.definition.geometryType, this._mainDirection);
-        const container = new NitroSprite();
-        const sprite = new NitroSprite(Texture.EMPTY);
+        const container = new Sprite();
+        const sprite = new Sprite(Texture.EMPTY);
 
         sprite.width = avatarCanvas.width;
         sprite.height = avatarCanvas.height;
@@ -601,31 +601,24 @@ export class AvatarImage implements IAvatarImage, IAvatarEffectListener
             partCount--;
         }
 
-        const texture = TextureUtils.generateTexture(container, new Rectangle(0, 0, avatarCanvas.width, avatarCanvas.height));
+        const texture = TextureUtils.generateTexture({
+            target: container,
+            frame: new Rectangle(0, 0, avatarCanvas.width, avatarCanvas.height)
+        });
 
         return await TextureUtils.generateImage(texture);
     }
 
-    protected getFullImage(k: string): RenderTexture
+    protected getFullImage(k: string): Texture
     {
         const existing = this._fullImageCache.getValue(k);
 
-        if(existing)
-        {
-            if(!existing.valid)
-            {
-                this._fullImageCache.remove(k);
-
-                existing.destroy(true);
-            }
-
-            return existing;
-        }
+        if(existing) return existing;
 
         return null;
     }
 
-    protected cacheFullImage(k: string, _arg_2: RenderTexture): void
+    protected cacheFullImage(k: string, _arg_2: Texture): void
     {
         const existing = this._fullImageCache.getValue(k);
 
@@ -1046,7 +1039,7 @@ export class AvatarImage implements IAvatarImage, IAvatarEffectListener
 
         colorFilter.matrix = [_local_3, _local_4, _local_5, 0, 0, _local_3, _local_4, _local_5, 0, 0, _local_3, _local_4, _local_5, 0, 0, 0, 0, 0, 1, 0];
 
-        container.filters.push(colorFilter);
+        (container.filters as Filter[]).push(colorFilter);
 
         return container;
     }

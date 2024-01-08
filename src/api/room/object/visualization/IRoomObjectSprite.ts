@@ -1,5 +1,4 @@
-import { Filter, Resource, Texture } from '@pixi/core';
-import { Container } from '@pixi/display';
+import { BLEND_MODES, Container, Filter, Texture } from 'pixi.js';
 
 export interface IRoomObjectSprite
 {
@@ -7,7 +6,7 @@ export interface IRoomObjectSprite
     name: string;
     type: string;
     spriteType: number;
-    texture: Texture<Resource>;
+    texture: Texture;
     container: Container;
     width: number;
     height: number;
@@ -17,7 +16,7 @@ export interface IRoomObjectSprite
     flipV: boolean;
     direction: number;
     alpha: number;
-    blendMode: number;
+    blendMode: BLEND_MODES;
     color: number;
     relativeDepth: number;
     varyingDepth: boolean;

@@ -1,7 +1,6 @@
 import { RoomObjectVariable, VoteDataType } from '../../../../../api';
-import { GetTickerTime } from '../../../../../pixi-proxy';
-import { RoomObjectUpdateMessage } from '../../../../../room';
-import { ObjectDataUpdateMessage } from '../../../messages';
+import { GetTickerTime } from '../../../../../common';
+import { ObjectDataUpdateMessage, RoomObjectUpdateMessage } from '../../../messages';
 import { FurnitureMultiStateLogic } from './FurnitureMultiStateLogic';
 
 export class FurnitureVoteCounterLogic extends FurnitureMultiStateLogic

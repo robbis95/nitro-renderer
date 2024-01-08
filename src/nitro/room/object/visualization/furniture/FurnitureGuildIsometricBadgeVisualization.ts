@@ -1,6 +1,6 @@
-import { Matrix, Resource, Texture } from '@pixi/core';
+import { Matrix, Sprite, Texture } from 'pixi.js';
 import { IGraphicAsset, IRoomObjectSprite, RoomObjectVariable } from '../../../../../api';
-import { NitroSprite, TextureUtils } from '../../../../../pixi-proxy';
+import { TextureUtils } from '../../../../../pixi-proxy';
 import { IsometricImageFurniVisualization } from './IsometricImageFurniVisualization';
 
 export class FurnitureGuildIsometricBadgeVisualization extends IsometricImageFurniVisualization
@@ -35,7 +35,7 @@ export class FurnitureGuildIsometricBadgeVisualization extends IsometricImageFur
         return flag;
     }
 
-    protected generateTransformedThumbnail(texture: Texture<Resource>, asset: IGraphicAsset): Texture<Resource>
+    protected generateTransformedThumbnail(texture: Texture, asset: IGraphicAsset): Texture
     {
         const scale = 1.1;
         const matrix = new Matrix();
@@ -69,9 +69,9 @@ export class FurnitureGuildIsometricBadgeVisualization extends IsometricImageFur
                 matrix.ty = 0;
         }
 
-        const sprite = new NitroSprite(texture);
+        const sprite = new Sprite(texture);
 
-        sprite.transform.setFromMatrix(matrix);
+        sprite.localTransform.copyFrom(matrix);
 
         sprite.position.set(0);
 

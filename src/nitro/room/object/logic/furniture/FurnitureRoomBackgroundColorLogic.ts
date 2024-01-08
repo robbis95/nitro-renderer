@@ -1,7 +1,6 @@
 import { IRoomGeometry, MouseEventType, NumberDataType, RoomObjectVariable } from '../../../../../api';
 import { RoomObjectHSLColorEnableEvent, RoomObjectWidgetRequestEvent, RoomSpriteMouseEvent } from '../../../../../events';
-import { RoomObjectUpdateMessage } from '../../../../../room';
-import { ObjectDataUpdateMessage } from '../../../messages';
+import { ObjectDataUpdateMessage, RoomObjectUpdateMessage } from '../../../messages';
 import { FurnitureMultiStateLogic } from './FurnitureMultiStateLogic';
 
 export class FurnitureRoomBackgroundColorLogic extends FurnitureMultiStateLogic

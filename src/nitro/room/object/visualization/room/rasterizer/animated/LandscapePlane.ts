@@ -1,4 +1,4 @@
-﻿import { RenderTexture } from '@pixi/core';
+﻿import { Texture } from 'pixi.js';
 import { IVector3D, Vector3d } from '../../../../../../../api';
 import { PlaneTextureCache } from '../../../../../../../pixi-proxy';
 import { Plane } from '../basic';
@@ -34,7 +34,7 @@ export class LandscapePlane extends Plane
         }
     }
 
-    public render(planeId: string, textureCache: PlaneTextureCache, canvas: RenderTexture, width: number, height: number, scale: number, normal: IVector3D, useTexture: boolean, offsetX: number, offsetY: number, maxX: number, maxY: number, timeSinceStartMs: number): RenderTexture
+    public render(planeId: string, textureCache: PlaneTextureCache, canvas: Texture, width: number, height: number, scale: number, normal: IVector3D, useTexture: boolean, offsetX: number, offsetY: number, maxX: number, maxY: number, timeSinceStartMs: number): Texture
     {
         const visualization = this.getPlaneVisualization(scale);
 

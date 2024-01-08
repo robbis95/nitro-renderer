@@ -1,11 +1,11 @@
-﻿import { RenderTexture } from '@pixi/core';
+﻿import { Texture } from 'pixi.js';
 import { IImageResult } from '../../api';
 import { TextureUtils } from '../../pixi-proxy';
 
 export class ImageResult implements IImageResult
 {
     public id: number = 0;
-    public data: RenderTexture = null;
+    public data: Texture = null;
     public image: HTMLImageElement = null;
 
     public async getImage(): Promise<HTMLImageElement>

@@ -1,7 +1,6 @@
 import { RoomObjectVariable } from '../../../../../api';
 import { RoomObjectDimmerStateUpdateEvent, RoomObjectWidgetRequestEvent } from '../../../../../events';
-import { RoomObjectUpdateMessage } from '../../../../../room';
-import { ObjectDataUpdateMessage } from '../../../messages';
+import { ObjectDataUpdateMessage, RoomObjectUpdateMessage } from '../../../messages';
 import { FurnitureLogic } from './FurnitureLogic';
 
 export class FurnitureRoomDimmerLogic extends FurnitureLogic

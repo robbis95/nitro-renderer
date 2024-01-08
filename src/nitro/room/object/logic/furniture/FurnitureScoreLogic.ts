@@ -1,6 +1,6 @@
-import { GetTickerTime } from '../../../../../pixi-proxy';
-import { RoomObjectUpdateMessage } from '../../../../../room';
-import { ObjectDataUpdateMessage } from '../../../messages';
+
+import { GetTickerTime } from '../../../../../common';
+import { ObjectDataUpdateMessage, RoomObjectUpdateMessage } from '../../../messages';
 import { FurnitureLogic } from './FurnitureLogic';
 
 export class FurnitureScoreLogic extends FurnitureLogic

@@ -1,7 +1,7 @@
-﻿import { NitroRenderTexture } from '../../../pixi-proxy';
+﻿import { Texture } from 'pixi.js';
 
 export interface IGetImageListener
 {
-    imageReady(id: number, texture: NitroRenderTexture, image?: HTMLImageElement): void;
+    imageReady(id: number, texture: Texture, image?: HTMLImageElement): void;
     imageFailed(id: number): void;
 }

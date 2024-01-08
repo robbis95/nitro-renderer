@@ -1,25 +1,22 @@
-import { RenderTexture, Resource, Texture } from '@pixi/core';
-import { Container } from '@pixi/display';
-import { Sprite } from '@pixi/sprite';
-import { Text } from '@pixi/text';
-import { NitroSprite, PixiApplicationProxy, TextureUtils } from '../../../../../pixi-proxy';
+import { Container, Sprite, Text, TextStyle, Texture } from 'pixi.js';
+import { TextureUtils } from '../../../../../pixi-proxy';
 
 export class ExperienceData
 {
     private _sprite: Sprite;
-    private _texture: RenderTexture;
+    private _texture: Texture;
     private _amount: number;
     private _alpha: number;
 
-    constructor(texture: Texture<Resource>)
+    constructor(texture: Texture)
     {
-        this._sprite = new NitroSprite(texture);
+        this._sprite = new Sprite(texture);
         this._texture = null;
         this._amount = -1;
         this._alpha = 0;
     }
 
-    public renderBubble(amount: number): RenderTexture
+    public renderBubble(amount: number): Texture
     {
         if(!this._sprite || (this._amount === amount)) return null;
 
@@ -27,11 +24,14 @@ export class ExperienceData
 
         container.addChild(this._sprite);
 
-        const text = new Text(('+' + amount), {
-            fontFamily: 'Arial',
-            fontSize: 9,
-            fill: 0xFFFFFF,
-            align: 'center'
+        const text = new Text({
+            text: ('+' + amount),
+            style: new TextStyle({
+                fontSize: 9,
+                fontFamily: 'Arial',
+                fill: 0xFFFFFF,
+                align: 'center'
+            })
         });
 
         text.anchor.x = 0.5;
@@ -47,10 +47,7 @@ export class ExperienceData
         }
         else
         {
-            PixiApplicationProxy.instance.renderer.render(container, {
-                renderTexture: this._texture,
-                clear: true
-            });
+            TextureUtils.writeToTexture(container, this._texture, true);
         }
 
         return this._texture;

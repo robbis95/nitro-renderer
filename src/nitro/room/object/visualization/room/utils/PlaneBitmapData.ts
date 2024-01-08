@@ -1,11 +1,11 @@
-﻿import { RenderTexture } from '@pixi/core';
+﻿import { Texture } from 'pixi.js';
 
 export class PlaneBitmapData
 {
-    private _texture: RenderTexture;
+    private _texture: Texture;
     private _timeStamp: number;
 
-    constructor(texture: RenderTexture, timestamp: number)
+    constructor(texture: Texture, timestamp: number)
     {
         this._texture = texture;
         this._timeStamp = timestamp;
@@ -16,7 +16,7 @@ export class PlaneBitmapData
         this._texture = null;
     }
 
-    public get texture(): RenderTexture
+    public get texture(): Texture
     {
         return this._texture;
     }

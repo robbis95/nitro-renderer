@@ -1,24 +1,26 @@
-import { Matrix, Point, Rectangle, RenderTexture, Resource, Texture } from '@pixi/core';
-import { Container, DisplayObject } from '@pixi/display';
-import { ICommunicationManager, IConnection, IFurnitureStackingHeightMap, IGetImageListener, IImageResult, ILegacyWallGeometry, IMessageComposer, IObjectData, IPetColorResult, IPetCustomPart, IRoomContentListener, IRoomContentLoader, IRoomCreator, IRoomEngine, IRoomEngineServices, IRoomGeometry, IRoomInstance, IRoomManager, IRoomManagerListener, IRoomObject, IRoomObjectController, IRoomObjectLogicFactory, IRoomObjectVisualizationFactory, IRoomRenderer, IRoomRendererFactory, IRoomRenderingCanvas, IRoomSessionManager, ISelectedRoomObjectData, ISessionDataManager, ITileObjectMap, IUpdateReceiver, IVector3D, LegacyDataType, MouseEventType, NitroConfiguration, NitroLogger, ObjectDataFactory, RoomControllerLevel, RoomObjectCategory, RoomObjectUserType, RoomObjectVariable, ToolbarIconEnum, Vector3d } from '../../api';
+import { Container, Matrix, Point, Rectangle, Sprite, Texture } from 'pixi.js';
+import { ICommunicationManager, IConnection, IFurnitureStackingHeightMap, IGetImageListener, IImageResult, ILegacyWallGeometry, IMessageComposer, IObjectData, IPetColorResult, IPetCustomPart, IRoomContentListener, IRoomContentLoader, IRoomCreator, IRoomEngine, IRoomEngineServices, IRoomGeometry, IRoomInstance, IRoomManager, IRoomManagerListener, IRoomObject, IRoomObjectController, IRoomObjectLogicFactory, IRoomObjectVisualizationFactory, IRoomRenderer, IRoomRendererFactory, IRoomRenderingCanvas, IRoomSessionManager, ISelectedRoomObjectData, ISessionDataManager, ITileObjectMap, IVector3D, LegacyDataType, MouseEventType, NitroConfiguration, NitroLogger, ObjectDataFactory, RoomControllerLevel, RoomObjectCategory, RoomObjectUserType, RoomObjectVariable, ToolbarIconEnum, Vector3d } from '../../api';
+import { GetTicker, GetTickerTime } from '../../common';
 import { BadgeImageReadyEvent, NitroEventDispatcher, NitroToolbarAnimateIconEvent, RoomBackgroundColorEvent, RoomDragEvent, RoomEngineEvent, RoomEngineObjectEvent, RoomObjectEvent, RoomObjectFurnitureActionEvent, RoomObjectMouseEvent, RoomSessionEvent, RoomToObjectOwnAvatarMoveEvent } from '../../events';
-import { GetTicker, GetTickerTime, NitroSprite, TextureUtils } from '../../pixi-proxy';
-import { NumberBank, RoomEnterEffect, RoomGeometry, RoomInstance, RoomManager, RoomObjectUpdateMessage, RoomRendererFactory } from '../../room';
+import { TextureUtils } from '../../pixi-proxy';
 import { PetFigureData } from '../avatar';
 import { RenderRoomMessageComposer, RenderRoomThumbnailMessageComposer } from '../communication';
 import { RoomSessionManager } from '../session';
 import { FurniId } from '../utils';
 import { ImageResult } from './ImageResult';
 import { RoomContentLoader } from './RoomContentLoader';
+import { RoomInstance } from './RoomInstance';
+import { RoomManager } from './RoomManager';
 import { RoomMessageHandler } from './RoomMessageHandler';
 import { RoomObjectEventHandler } from './RoomObjectEventHandler';
 import { RoomObjectLogicFactory } from './RoomObjectLogicFactory';
 import { RoomVariableEnum } from './RoomVariableEnum';
-import { ObjectAvatarCarryObjectUpdateMessage, ObjectAvatarChatUpdateMessage, ObjectAvatarDanceUpdateMessage, ObjectAvatarEffectUpdateMessage, ObjectAvatarExperienceUpdateMessage, ObjectAvatarExpressionUpdateMessage, ObjectAvatarFigureUpdateMessage, ObjectAvatarFlatControlUpdateMessage, ObjectAvatarGestureUpdateMessage, ObjectAvatarGuideStatusUpdateMessage, ObjectAvatarMutedUpdateMessage, ObjectAvatarOwnMessage, ObjectAvatarPetGestureUpdateMessage, ObjectAvatarPlayerValueUpdateMessage, ObjectAvatarPlayingGameUpdateMessage, ObjectAvatarPostureUpdateMessage, ObjectAvatarSignUpdateMessage, ObjectAvatarSleepUpdateMessage, ObjectAvatarTypingUpdateMessage, ObjectAvatarUpdateMessage, ObjectAvatarUseObjectUpdateMessage, ObjectDataUpdateMessage, ObjectGroupBadgeUpdateMessage, ObjectHeightUpdateMessage, ObjectItemDataUpdateMessage, ObjectModelDataUpdateMessage, ObjectMoveUpdateMessage, ObjectRoomColorUpdateMessage, ObjectRoomFloorHoleUpdateMessage, ObjectRoomMaskUpdateMessage, ObjectRoomPlanePropertyUpdateMessage, ObjectRoomPlaneVisibilityUpdateMessage, ObjectRoomUpdateMessage, ObjectStateUpdateMessage } from './messages';
+import { ObjectAvatarCarryObjectUpdateMessage, ObjectAvatarChatUpdateMessage, ObjectAvatarDanceUpdateMessage, ObjectAvatarEffectUpdateMessage, ObjectAvatarExperienceUpdateMessage, ObjectAvatarExpressionUpdateMessage, ObjectAvatarFigureUpdateMessage, ObjectAvatarFlatControlUpdateMessage, ObjectAvatarGestureUpdateMessage, ObjectAvatarGuideStatusUpdateMessage, ObjectAvatarMutedUpdateMessage, ObjectAvatarOwnMessage, ObjectAvatarPetGestureUpdateMessage, ObjectAvatarPlayerValueUpdateMessage, ObjectAvatarPlayingGameUpdateMessage, ObjectAvatarPostureUpdateMessage, ObjectAvatarSignUpdateMessage, ObjectAvatarSleepUpdateMessage, ObjectAvatarTypingUpdateMessage, ObjectAvatarUpdateMessage, ObjectAvatarUseObjectUpdateMessage, ObjectDataUpdateMessage, ObjectGroupBadgeUpdateMessage, ObjectHeightUpdateMessage, ObjectItemDataUpdateMessage, ObjectModelDataUpdateMessage, ObjectMoveUpdateMessage, ObjectRoomColorUpdateMessage, ObjectRoomFloorHoleUpdateMessage, ObjectRoomMaskUpdateMessage, ObjectRoomPlanePropertyUpdateMessage, ObjectRoomPlaneVisibilityUpdateMessage, ObjectRoomUpdateMessage, ObjectStateUpdateMessage, RoomObjectUpdateMessage } from './messages';
 import { RoomLogic, RoomMapData, RoomObjectVisualizationFactory } from './object';
-import { RoomCamera, RoomData, RoomFurnitureData, RoomInstanceData, RoomObjectBadgeImageAssetListener, SpriteDataCollector } from './utils';
+import { RoomRendererFactory } from './renderer';
+import { NumberBank, RoomCamera, RoomData, RoomEnterEffect, RoomFurnitureData, RoomGeometry, RoomInstanceData, RoomObjectBadgeImageAssetListener, SpriteDataCollector } from './utils';
 
-export class RoomEngine implements IRoomEngine, IRoomCreator, IRoomEngineServices, IRoomManagerListener, IRoomContentListener, IUpdateReceiver
+export class RoomEngine implements IRoomEngine, IRoomCreator, IRoomEngineServices, IRoomManagerListener, IRoomContentListener
 {
     public static ROOM_OBJECT_ID: number = -1;
     public static ROOM_OBJECT_TYPE: string = 'room';
@@ -107,12 +109,12 @@ export class RoomEngine implements IRoomEngine, IRoomCreator, IRoomEngineService
             this.createRoomInstance(roomData.roomId, roomData.data);
         }
 
-        GetTicker().add(this.update, this);
-
         document.addEventListener('visibilitychange', event =>
         {
-            if(!document.hidden) this.update(1, true);
+            if(!document.hidden) this.update();
         });
+
+        GetTicker().add(() => this.update());
     }
 
     private onRoomSessionEvent(event: RoomSessionEvent): void
@@ -327,7 +329,7 @@ export class RoomEngine implements IRoomEngine, IRoomCreator, IRoomEngineService
         return instance;
     }
 
-    public getRoomInstanceDisplay(roomId: number, id: number, width: number, height: number, scale: number): DisplayObject
+    public getRoomInstanceDisplay(roomId: number, id: number, width: number, height: number, scale: number): Container
     {
         const instance = this.getRoomInstance(roomId);
 
@@ -391,7 +393,7 @@ export class RoomEngine implements IRoomEngine, IRoomCreator, IRoomEngineService
 
             if(displayObject)
             {
-                const overlay = new NitroSprite(Texture.EMPTY);
+                const overlay = new Sprite(Texture.EMPTY);
 
                 overlay.name = RoomEngine.OVERLAY;
 
@@ -678,35 +680,17 @@ export class RoomEngine implements IRoomEngine, IRoomCreator, IRoomEngineService
         return this.isRoomIdPlayingGame(this._activeRoomId);
     }
 
-    public disableUpdate(flag: boolean): void
-    {
-        if(flag)
-        {
-            GetTicker().remove(this.update, this);
-        }
-        else
-        {
-            GetTicker().remove(this.update, this);
-            GetTicker().add(this.update, this);
-        }
-    }
-
-    public runUpdate(): void
-    {
-        this.update(1);
-    }
-
-    public update(time: number, update: boolean = false): void
+    public update(flag: boolean = false): void
     {
         if(!this._roomManager) return;
 
-        time = GetTickerTime();
+        const time = GetTickerTime();
 
         RoomEnterEffect.turnVisualizationOn();
 
         this.processPendingFurniture();
 
-        this._roomManager.update(time, update);
+        this._roomManager.update(time, flag);
 
         this.updateRoomCameras(time);
 
@@ -2543,7 +2527,7 @@ export class RoomEngine implements IRoomEngine, IRoomCreator, IRoomEngineService
         this._roomObjectEventHandler.cancelRoomObjectInsert(this._activeRoomId);
     }
 
-    private addOverlayIconSprite(k: NitroSprite, _arg_2: string, _arg_3: Texture<Resource>, scale: number = 1): NitroSprite
+    private addOverlayIconSprite(k: Sprite, _arg_2: string, _arg_3: Texture, scale: number = 1): Sprite
     {
         if(!k || !_arg_3) return;
 
@@ -2551,7 +2535,7 @@ export class RoomEngine implements IRoomEngine, IRoomCreator, IRoomEngineService
 
         if(sprite) return null;
 
-        sprite = new NitroSprite(_arg_3);
+        sprite = new Sprite(_arg_3);
 
         sprite.name = _arg_2;
 
@@ -2916,7 +2900,7 @@ export class RoomEngine implements IRoomEngine, IRoomCreator, IRoomEngineService
             }
         }
 
-        const texture = visualization.getImage(bgColor, originalId);
+        const texture = visualization.getObjectAsTexture();
 
         imageResult.data = texture;
         imageResult.id = objectId;
@@ -3035,7 +3019,7 @@ export class RoomEngine implements IRoomEngine, IRoomCreator, IRoomEngineService
                     const objectId = roomObject.id;
                     const visualization = roomObject.visualization;
 
-                    let texture: RenderTexture = null;
+                    let texture: Texture = null;
 
                     if(visualization)
                     {
@@ -3057,7 +3041,7 @@ export class RoomEngine implements IRoomEngine, IRoomCreator, IRoomEngineService
 
                         visualization.update(geometry, 0, true, false);
 
-                        texture = visualization.image;
+                        texture = visualization.getObjectAsTexture();
                     }
 
                     roomInstance.removeRoomObject(objectId, objectCategory);
@@ -3111,7 +3095,7 @@ export class RoomEngine implements IRoomEngine, IRoomCreator, IRoomEngineService
         this.removeOverlayIconSprite(sprite, RoomEngine.OBJECT_ICON_SPRITE);
     }
 
-    private getRenderingCanvasOverlay(k: IRoomRenderingCanvas): NitroSprite
+    private getRenderingCanvasOverlay(k: IRoomRenderingCanvas): Sprite
     {
         if(!k) return null;
 
@@ -3119,10 +3103,10 @@ export class RoomEngine implements IRoomEngine, IRoomCreator, IRoomEngineService
 
         if(!displayObject) return null;
 
-        return ((displayObject.getChildByName(RoomEngine.OVERLAY) as NitroSprite) || null);
+        return ((displayObject.getChildByName(RoomEngine.OVERLAY) as Sprite) || null);
     }
 
-    private removeOverlayIconSprite(k: NitroSprite, _arg_2: string): boolean
+    private removeOverlayIconSprite(k: Sprite, _arg_2: string): boolean
     {
         if(!k) return false;
 
@@ -3130,7 +3114,7 @@ export class RoomEngine implements IRoomEngine, IRoomCreator, IRoomEngineService
 
         while(index >= 0)
         {
-            const child = (k.getChildAt(index) as NitroSprite);
+            const child = (k.getChildAt(index) as Sprite);
 
             if(child)
             {
@@ -3140,7 +3124,7 @@ export class RoomEngine implements IRoomEngine, IRoomCreator, IRoomEngineService
 
                     if(child.children.length)
                     {
-                        const firstChild = (child.getChildAt(0) as NitroSprite);
+                        const firstChild = (child.getChildAt(0) as Sprite);
 
                         firstChild.parent.removeChild(firstChild);
 
@@ -3157,7 +3141,7 @@ export class RoomEngine implements IRoomEngine, IRoomCreator, IRoomEngineService
         return false;
     }
 
-    private getOverlayIconSprite(k: NitroSprite, _arg_2: string): NitroSprite
+    private getOverlayIconSprite(k: Sprite, _arg_2: string): Sprite
     {
         if(!k) return null;
 
@@ -3165,7 +3149,7 @@ export class RoomEngine implements IRoomEngine, IRoomCreator, IRoomEngineService
 
         while(index >= 0)
         {
-            const child = (k.getChildAt(index) as NitroSprite);
+            const child = (k.getChildAt(index) as Sprite);
 
             if(child)
             {
@@ -3249,7 +3233,7 @@ export class RoomEngine implements IRoomEngine, IRoomCreator, IRoomEngineService
         return null;
     }
 
-    public createTextureFromRoom(roomId: number, canvasId: number = -1, bounds: Rectangle = null): RenderTexture
+    public createTextureFromRoom(roomId: number, canvasId: number = -1, bounds: Rectangle = null): Texture
     {
         let canvas: IRoomRenderingCanvas = null;
 
@@ -3262,11 +3246,14 @@ export class RoomEngine implements IRoomEngine, IRoomCreator, IRoomEngineService
             canvas = this.getActiveRoomInstanceRenderingCanvas();
         }
 
-        let texture: RenderTexture = null;
+        let texture: Texture = null;
 
         if(bounds)
         {
-            texture = TextureUtils.generateTexture(canvas.master, bounds);
+            texture = TextureUtils.generateTexture({
+                target: canvas.master,
+                frame: bounds
+            });
         }
         else
         {
@@ -3276,7 +3263,7 @@ export class RoomEngine implements IRoomEngine, IRoomCreator, IRoomEngineService
         return texture;
     }
 
-    public async saveTextureAsScreenshot(texture: RenderTexture, saveAsThumbnail: boolean = false): Promise<void>
+    public async saveTextureAsScreenshot(texture: Texture, saveAsThumbnail: boolean = false): Promise<void>
     {
         let composer: RenderRoomMessageComposer = null;
 

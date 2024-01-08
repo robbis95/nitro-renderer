@@ -1,5 +1,4 @@
-import { Point, Rectangle, RenderTexture } from '@pixi/core';
-import { DisplayObject } from '@pixi/display';
+import { Container, Point, Rectangle, Texture } from 'pixi.js';
 import { IRoomGeometry, IRoomManager, IRoomObject, IRoomObjectController, IRoomObjectLogicFactory, IRoomObjectVisualizationFactory, IRoomRendererFactory, IRoomRenderingCanvas, IVector3D } from '../../room';
 import { IPetCustomPart } from '../avatar';
 import { IRoomSessionManager, ISessionDataManager } from '../session';
@@ -14,10 +13,9 @@ export interface IRoomEngine
 {
     init(): Promise<void>;
     setActiveRoomId(roomId: number): void;
-    disableUpdate(flag: boolean): void;
-    runUpdate(): void;
+    update(flag?: boolean): void;
     createRoomInstance(roomId: number, roomMap: IRoomMapData): void;
-    getRoomInstanceDisplay(roomId: number, id: number, width: number, height: number, scale: number): DisplayObject;
+    getRoomInstanceDisplay(roomId: number, id: number, width: number, height: number, scale: number): Container;
     setRoomInstanceRenderingCanvasScale(roomId: number, canvasId: number, scale: number, point?: Point, offsetPoint?: Point, override?: boolean, asDelta?: boolean): void;
     setRoomInstanceRenderingCanvasMask(roomId: number, canvasId: number, flag: boolean): void;
     getRoomInstanceRenderingCanvas(roomId: number, canvasId?: number): IRoomRenderingCanvas;
@@ -81,8 +79,8 @@ export interface IRoomEngine
     modifyRoomObjectData(objectId: number, category: number, colorHex: string, data: string): boolean
     processRoomObjectPlacement(placementSource: string, id: number, category: number, typeId: number, legacyString?: string, stuffData?: IObjectData, state?: number, frameNumber?: number, posture?: string): boolean;
     dispatchMouseEvent(canvasId: number, x: number, y: number, type: string, altKey: boolean, ctrlKey: boolean, shiftKey: boolean, buttonDown: boolean): void;
-    createTextureFromRoom(roomId: number, canvasId?: number, bounds?: Rectangle): RenderTexture;
-    saveTextureAsScreenshot(texture: RenderTexture, saveAsThumbnail?: boolean): Promise<void>;
+    createTextureFromRoom(roomId: number, canvasId?: number, bounds?: Rectangle): Texture;
+    saveTextureAsScreenshot(texture: Texture, saveAsThumbnail?: boolean): Promise<void>;
     saveBase64AsScreenshot(base64: string, saveAsThumbnail?: boolean): void;
     deleteRoomObject(objectId: number, objectCategory: number): boolean;
     sessionDataManager: ISessionDataManager;

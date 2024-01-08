@@ -1,4 +1,4 @@
-import { Resource, Texture } from '@pixi/core';
+import { Texture } from 'pixi.js';
 import { AvatarScaleType, IAssetData, IAvatarEffectListener, IAvatarImage, IAvatarImageListener, IAvatarRenderManager, IObjectVisualizationData } from '../../../../../api';
 
 export class AvatarVisualizationData implements IObjectVisualizationData
@@ -25,7 +25,7 @@ export class AvatarVisualizationData implements IObjectVisualizationData
         return avatarImage;
     }
 
-    public getAvatarRendererAsset(name: string): Texture<Resource>
+    public getAvatarRendererAsset(name: string): Texture
     {
         if(!this._avatarRenderer) return null;
 

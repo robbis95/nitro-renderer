@@ -1,4 +1,4 @@
-import { RenderTexture } from '@pixi/core';
+import { Texture } from 'pixi.js';
 import { IMessageComposer } from '../../../../../api';
 import { TextureUtils } from '../../../../../pixi-proxy';
 
@@ -21,7 +21,7 @@ export class RenderRoomMessageComposer implements IMessageComposer<ConstructorPa
         this._data = [];
     }
 
-    public async assignBitmap(texture: RenderTexture): Promise<void>
+    public async assignBitmap(texture: Texture): Promise<void>
     {
         const url = await TextureUtils.generateImageUrl(texture);
 

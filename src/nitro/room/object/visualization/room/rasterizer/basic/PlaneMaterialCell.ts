@@ -1,6 +1,4 @@
-﻿import { Matrix, Point } from '@pixi/core';
-import { Sprite } from '@pixi/sprite';
-import { TilingSprite } from '@pixi/sprite-tiling';
+﻿import { Container, Point, Sprite, TilingSprite } from 'pixi.js';
 import { IGraphicAsset, IVector3D } from '../../../../../../../api';
 import { Randomizer } from '../../utils';
 import { PlaneTexture } from './PlaneTexture';
@@ -88,7 +86,7 @@ export class PlaneMaterialCell
         return 0;
     }
 
-    public render(normal: IVector3D, textureOffsetX: number, textureOffsetY: number): Sprite
+    public render(normal: IVector3D, textureOffsetX: number, textureOffsetY: number): Container
     {
         if(!this._texture) return null;
 
@@ -96,7 +94,11 @@ export class PlaneMaterialCell
 
         if(!texture) return null;
 
-        const bitmap = new TilingSprite(texture, texture.width, texture.height);
+        const bitmap = TilingSprite.from(texture, {
+            width: texture.width,
+            height: texture.height,
+            applyAnchorToTexture: true
+        });
 
         if((textureOffsetX !== 0) || (textureOffsetY !== 0))
         {
@@ -104,9 +106,7 @@ export class PlaneMaterialCell
 
             while(textureOffsetY < 0) textureOffsetY += texture.height;
 
-            bitmap.tilePosition.set((textureOffsetX % texture.width), (textureOffsetY % texture.height));
-
-            bitmap.uvRespectAnchor = true;
+            bitmap.tilePosition = { x: (textureOffsetX % texture.width), y: (textureOffsetY % texture.height) };
 
             if(textureOffsetX)
             {
@@ -163,17 +163,14 @@ export class PlaneMaterialCell
                         }
 
                         const offsetFinal = new Point((offset.x + itemOffsetX), (offset.y + itemOffsetY));
-                        const flipMatrix = new Matrix();
 
                         let offsetX = (offsetFinal.x + translateX);
                         offsetX = ((offsetX >> 1) << 1);
 
-                        flipMatrix.scale(x, y);
-                        flipMatrix.translate(offsetX, (offsetFinal.y + translateY));
-
                         const sprite = new Sprite(assetTexture);
 
-                        sprite.transform.setFromMatrix(flipMatrix);
+                        sprite.scale.set(x, y);
+                        sprite.position.set(offsetX, (offsetFinal.y + translateY));
 
                         bitmap.addChild(sprite);
                     }

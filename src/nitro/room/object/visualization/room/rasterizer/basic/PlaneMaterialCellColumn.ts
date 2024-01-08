@@ -1,4 +1,4 @@
-import { RenderTexture } from '@pixi/core';
+import { Texture } from 'pixi.js';
 import { IVector3D, Vector3d } from '../../../../../../../api';
 import { PlaneTextureCache, TextureUtils } from '../../../../../../../pixi-proxy';
 import { PlaneMaterialCell } from './PlaneMaterialCell';
@@ -15,7 +15,7 @@ export class PlaneMaterialCellColumn
     private _cells: PlaneMaterialCell[];
     private _repeatMode: number;
     private _width: number;
-    private _cachedBitmapData: RenderTexture;
+    private _cachedBitmapData: Texture;
     private _cachedBitmapNormal: Vector3d;
     private _cachedBitmapDataOffsetX: number;
     private _cachedBitmapDataOffsetY: number;
@@ -114,7 +114,7 @@ export class PlaneMaterialCellColumn
         this._isCached = false;
     }
 
-    public render(planeId: string, textureCache: PlaneTextureCache, height: number, normal: IVector3D, offsetX: number, offsetY: number): RenderTexture
+    public render(planeId: string, textureCache: PlaneTextureCache, height: number, normal: IVector3D, offsetX: number, offsetY: number): Texture
     {
         if(this._repeatMode === PlaneMaterialCellColumn.REPEAT_MODE_NONE) height = this.getCellsHeight(this._cells, normal);
 
@@ -143,7 +143,7 @@ export class PlaneMaterialCellColumn
 
         if(!this._cachedBitmapData)
         {
-            this._cachedBitmapData = textureCache.createRenderTexture(this._width, height, `${ planeId }:column`);
+            this._cachedBitmapData = textureCache.createTexture(this._width, height, `${ planeId }:column`);
         }
 
         this._cachedBitmapNormal.assign(normal);
@@ -225,7 +225,7 @@ export class PlaneMaterialCellColumn
 
                     graphic.y = index;
 
-                    TextureUtils.writeToRenderTexture(graphic, this._cachedBitmapData, false);
+                    TextureUtils.writeToTexture(graphic, this._cachedBitmapData, false);
 
                     if(flag) index = (index + graphic.height);
 

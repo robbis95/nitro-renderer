@@ -1,6 +1,6 @@
 import { IRoomObjectController, IRoomObjectUpdateMessage, IVector3D, RoomObjectVariable, Vector3d } from '../../../../api';
-import { RoomObjectLogicBase } from '../../../../room';
 import { ObjectMoveUpdateMessage } from '../../messages';
+import { RoomObjectLogicBase } from './RoomObjectLogicBase';
 
 export class MovingObjectLogic extends RoomObjectLogicBase
 {

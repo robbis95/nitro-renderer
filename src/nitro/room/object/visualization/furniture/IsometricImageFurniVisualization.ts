@@ -1,6 +1,6 @@
-import { Matrix, Resource, Texture } from '@pixi/core';
+import { Matrix, Sprite, Texture } from 'pixi.js';
 import { IGraphicAsset } from '../../../../../api';
-import { NitroSprite, TextureUtils } from '../../../../../pixi-proxy';
+import { TextureUtils } from '../../../../../pixi-proxy';
 import { FurnitureAnimatedVisualization } from './FurnitureAnimatedVisualization';
 
 export class IsometricImageFurniVisualization extends FurnitureAnimatedVisualization
@@ -8,7 +8,7 @@ export class IsometricImageFurniVisualization extends FurnitureAnimatedVisualiza
     protected static THUMBNAIL: string = 'THUMBNAIL';
 
     private _thumbnailAssetNameNormal: string;
-    private _thumbnailImageNormal: Texture<Resource>;
+    private _thumbnailImageNormal: Texture;
     private _thumbnailDirection: number;
     private _thumbnailChanged: boolean;
     protected _hasOutline: boolean;
@@ -29,7 +29,7 @@ export class IsometricImageFurniVisualization extends FurnitureAnimatedVisualiza
         return !(this._thumbnailImageNormal == null);
     }
 
-    public setThumbnailImages(k: Texture<Resource>): void
+    public setThumbnailImages(k: Texture): void
     {
         this._thumbnailImageNormal = k;
         this._thumbnailChanged = true;
@@ -63,7 +63,7 @@ export class IsometricImageFurniVisualization extends FurnitureAnimatedVisualiza
         this._thumbnailDirection = this.direction;
     }
 
-    private addThumbnailAsset(k: Texture<Resource>, scale: number): void
+    private addThumbnailAsset(k: Texture, scale: number): void
     {
         let layerId = 0;
 
@@ -90,18 +90,18 @@ export class IsometricImageFurniVisualization extends FurnitureAnimatedVisualiza
         }
     }
 
-    protected generateTransformedThumbnail(texture: Texture<Resource>, asset: IGraphicAsset): Texture<Resource>
+    protected generateTransformedThumbnail(texture: Texture, asset: IGraphicAsset): Texture
     {
         if(this._hasOutline)
         {
-            const container = new NitroSprite();
-            const background = new NitroSprite(Texture.WHITE);
+            const container = new Sprite();
+            const background = new Sprite(Texture.WHITE);
 
             background.tint = 0x000000;
             background.width = (texture.width + 40);
             background.height = (texture.height + 40);
 
-            const sprite = new NitroSprite(texture);
+            const sprite = new Sprite(texture);
             const offsetX = ((background.width - sprite.width) / 2);
             const offsetY = ((background.height - sprite.height) / 2);
 
@@ -144,9 +144,9 @@ export class IsometricImageFurniVisualization extends FurnitureAnimatedVisualiza
                 matrix.ty = 0;
         }
 
-        const sprite = new NitroSprite(texture);
+        const sprite = new Sprite(texture);
 
-        sprite.transform.setFromMatrix(matrix);
+        // sprite.transform.setFromMatrix(matrix);
 
         return TextureUtils.generateTexture(sprite);
     }

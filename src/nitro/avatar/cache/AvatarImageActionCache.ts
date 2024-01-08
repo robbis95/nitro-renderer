@@ -1,22 +1,18 @@
-﻿import { GetTickerTime } from '../../../pixi-proxy';
+﻿import { GetTickerTime } from '../../../common';
 import { AvatarImageDirectionCache } from './AvatarImageDirectionCache';
 
 export class AvatarImageActionCache
 {
-    private _cache: Map<string, AvatarImageDirectionCache>;
-    private _lastAccessTime: number;
+    private _cache: Map<string, AvatarImageDirectionCache> = new Map();
+    private _lastAccessTime: number = 0;
 
     constructor()
     {
-        this._cache = new Map();
-
         this.setLastAccessTime(GetTickerTime());
     }
 
     public dispose(): void
     {
-        this.debugInfo('[dispose]');
-
         if(!this._cache) return;
 
         for(const direction of this._cache.values())
@@ -27,31 +23,27 @@ export class AvatarImageActionCache
         this._cache.clear();
     }
 
-    public getDirectionCache(k: number): AvatarImageDirectionCache
+    public getDirectionCache(direction: number): AvatarImageDirectionCache
     {
-        const existing = this._cache.get(k.toString());
+        const existing = this._cache.get(direction.toString());
 
         if(!existing) return null;
 
         return existing;
     }
 
-    public updateDirectionCache(k: number, _arg_2: AvatarImageDirectionCache): void
+    public updateDirectionCache(direction: number, cache: AvatarImageDirectionCache): void
     {
-        this._cache.set(k.toString(), _arg_2);
+        this._cache.set(direction.toString(), cache);
     }
 
-    public setLastAccessTime(k: number): void
+    public setLastAccessTime(time: number): void
     {
-        this._lastAccessTime = k;
+        this._lastAccessTime = time;
     }
 
     public getLastAccessTime(): number
     {
         return this._lastAccessTime;
-    }
-
-    private debugInfo(k: string): void
-    {
     }
 }

@@ -3,5 +3,4 @@ export * from './IEventDispatcher';
 export * from './ILinkEventTracker';
 export * from './INitroEvent';
 export * from './INitroManager';
-export * from './IUpdateReceiver';
 export * from './NitroLogger';

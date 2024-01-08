@@ -1,6 +1,5 @@
-import { BaseTexture, Resource, Texture } from '@pixi/core';
-import { Spritesheet } from '@pixi/spritesheet';
-import { FurnitureType, GetAssetManager, GraphicAssetCollection, GraphicAssetGifCollection, IAssetData, IEventDispatcher, IFurnitureData, IGraphicAssetCollection, IGraphicAssetGifCollection, IPetColorResult, IRoomContentListener, IRoomContentLoader, IRoomObject, ISessionDataManager, NitroBundle, NitroConfiguration, NitroLogger, RoomObjectCategory, RoomObjectUserType, RoomObjectVariable, RoomObjectVisualizationType } from '../../api';
+import { Spritesheet, Texture } from 'pixi.js';
+import { FurnitureType, GetAssetManager, GraphicAssetCollection, GraphicAssetGifCollection, IAssetData, IEventDispatcher, IFurnitureData, IGraphicAssetCollection, IGraphicAssetGifCollection, IPetColorResult, IRoomContentListener, IRoomContentLoader, IRoomObject, ISessionDataManager, ISpritesheetData, NitroBundle, NitroConfiguration, NitroLogger, RoomObjectCategory, RoomObjectUserType, RoomObjectVariable, RoomObjectVisualizationType } from '../../api';
 import { NitroEventDispatcher } from '../../events';
 import { RoomContentLoadedEvent } from '../../events/room/RoomContentLoadedEvent';
 import { PetColorResult } from './PetColorResult';
@@ -245,7 +244,7 @@ export class RoomContentLoader implements IRoomContentLoader
         return image;
     }
 
-    public addAssetToCollection(collectionName: string, assetName: string, texture: Texture<Resource>, override: boolean = true): boolean
+    public addAssetToCollection(collectionName: string, assetName: string, texture: Texture, override: boolean = true): boolean
     {
         const collection = this.getCollection(collectionName);
 
@@ -254,7 +253,7 @@ export class RoomContentLoader implements IRoomContentLoader
         return collection.addAsset(assetName, texture, override, 0, 0, false, false);
     }
 
-    public createGifCollection(collectionName: string, textures: Texture<Resource>[], durations: number[]): GraphicAssetGifCollection
+    public createGifCollection(collectionName: string, textures: Texture[], durations: number[]): GraphicAssetGifCollection
     {
         if(!collectionName || !textures || !durations) return null;
 
@@ -431,9 +430,9 @@ export class RoomContentLoader implements IRoomContentLoader
 
             if(contentType === 'application/octet-stream')
             {
-                const nitroBundle = new NitroBundle(await response.arrayBuffer());
+                const bundle = await NitroBundle.from(await response.arrayBuffer());
 
-                await this.processAsset(nitroBundle.baseTexture, (nitroBundle.jsonFile as IAssetData));
+                await this.processAsset(bundle.texture, (bundle.file as IAssetData));
 
                 NitroEventDispatcher.dispatchEvent(new RoomContentLoadedEvent(RoomContentLoadedEvent.RCLE_SUCCESS, type));
             }
@@ -447,42 +446,18 @@ export class RoomContentLoader implements IRoomContentLoader
         }
     }
 
-    private async processAsset(baseTexture: BaseTexture, data: IAssetData): Promise<void>
+    private async processAsset(texture: Texture, data: IAssetData): Promise<void>
     {
-        const spritesheetData = data.spritesheet;
+        let spritesheet: Spritesheet<ISpritesheetData> = null;
 
-        if(!baseTexture || !spritesheetData || !Object.keys(spritesheetData).length)
+        if(texture && data?.spritesheet && Object.keys(data.spritesheet).length)
         {
-            this.createCollection(data, null);
-
-            return;
-        }
-
-        const createAsset = async () =>
-        {
-            const spritesheet = new Spritesheet(baseTexture, spritesheetData);
+            spritesheet = new Spritesheet(texture, data.spritesheet);
 
             await spritesheet.parse();
-
-            this.createCollection(data, spritesheet);
-        };
-
-        if(baseTexture.valid)
-        {
-            await createAsset();
         }
-        else
-        {
-            await new Promise<void>((resolve, reject) =>
-            {
-                baseTexture.once('update', async () =>
-                {
-                    await createAsset();
 
-                    return resolve();
-                });
-            });
-        }
+        this.createCollection(data, spritesheet);
     }
 
     public setAssetAliasName(name: string, originalName: string): void

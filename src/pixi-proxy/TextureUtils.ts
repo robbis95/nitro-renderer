@@ -1,60 +1,44 @@
-import { ICanvas, IRenderer, Matrix, Rectangle, RenderTexture, Resource, settings, Texture } from '@pixi/core';
-import { DisplayObject } from '@pixi/display';
-import { IExtract } from '@pixi/extract';
-import { Sprite } from '@pixi/sprite';
-import { PixiApplicationProxy } from './PixiApplicationProxy';
+import { Container, ExtractImageOptions, ExtractOptions, ExtractSystem, GenerateTextureOptions, GetPixelsOutput, ICanvas, Matrix, RenderSurface, RenderTexture, Renderer, Sprite, Texture } from 'pixi.js';
+import { GetPixi } from '../common';
 
 export class TextureUtils
 {
-    public static generateTexture(displayObject: DisplayObject, region: Rectangle = null, scaleMode: number = null, resolution: number = 1): RenderTexture
+    public static generateTexture(options: GenerateTextureOptions | Container): Texture
     {
-        if(!displayObject) return null;
+        if(!options) return null;
 
-        if(scaleMode === null) scaleMode = settings.SCALE_MODE;
-
-        return this.getRenderer().generateTexture(displayObject, {
-            scaleMode,
-            resolution,
-            region
-        });
+        return this.getRenderer().textureGenerator.generateTexture(options);
     }
 
-    public static generateTextureFromImage(image: HTMLImageElement): Texture<Resource>
+    public static async generateImage(options: ExtractImageOptions | Container | Texture): Promise<HTMLImageElement>
     {
-        if(!image) return null;
+        if(!options) return null;
 
-        return Texture.from(image);
+        return await this.getExtractor().image(options);
     }
 
-    public static async generateImage(target: DisplayObject | RenderTexture): Promise<HTMLImageElement>
+    public static async generateImageUrl(options: ExtractImageOptions | Container | Texture): Promise<string>
     {
-        if(!target) return null;
+        if(!options) return null;
 
-        return this.getExtractor().image(target);
+        return await this.getExtractor().base64(options);
     }
 
-    public static async generateImageUrl(target: DisplayObject | RenderTexture): Promise<string>
+    public static generateCanvas(options: ExtractImageOptions | Container | Texture): ICanvas
     {
-        if(!target) return null;
+        if(!options) return null;
 
-        return this.getExtractor().base64(target);
+        return this.getExtractor().canvas(options);
     }
 
-    public static generateCanvas(target: DisplayObject | RenderTexture): ICanvas
+    public static clearTexture(texture: Texture): RenderSurface
     {
-        if(!target) return null;
+        if(!texture) return null;
 
-        return this.getExtractor().canvas(target);
+        return this.writeToTexture(new Sprite(Texture.EMPTY), texture);
     }
 
-    public static clearRenderTexture(renderTexture: RenderTexture): RenderTexture
-    {
-        if(!renderTexture) return null;
-
-        return this.writeToRenderTexture(new Sprite(Texture.EMPTY), renderTexture);
-    }
-
-    public static createRenderTexture(width: number, height: number): RenderTexture
+    public static createTexture(width: number, height: number): Texture
     {
         if((width < 0) || (height < 0)) return null;
 
@@ -64,62 +48,63 @@ export class TextureUtils
         });
     }
 
-    public static createAndFillRenderTexture(width: number, height: number, color: number = 16777215): RenderTexture
+    public static createAndFillRenderTexture(width: number, height: number, color: number = 16777215): RenderSurface
     {
         if((width < 0) || (height < 0)) return null;
 
-        const renderTexture = this.createRenderTexture(width, height);
+        const texture = this.createTexture(width, height);
 
-        return this.clearAndFillRenderTexture(renderTexture, color);
+        return this.clearAndFillTexture(texture, color);
     }
 
-    public static createAndWriteRenderTexture(width: number, height: number, displayObject: DisplayObject, transform: Matrix = null): RenderTexture
+    public static createAndWriteRenderTexture(width: number, height: number, container: Container, transform: Matrix = null): RenderSurface
     {
         if((width < 0) || (height < 0)) return null;
 
-        const renderTexture = this.createRenderTexture(width, height);
+        const texture = this.createTexture(width, height);
 
-        return this.writeToRenderTexture(displayObject, renderTexture, true, transform);
+        return this.writeToTexture(container, texture, true, transform);
     }
 
-    public static clearAndFillRenderTexture(renderTexture: RenderTexture, color: number = 16777215): RenderTexture
+    public static clearAndFillTexture(target: Texture, color: number = 16777215): RenderSurface
     {
-        if(!renderTexture) return null;
+        if(!target) return null;
 
         const sprite = new Sprite(Texture.WHITE);
 
         sprite.tint = color;
 
-        sprite.width = renderTexture.width;
-        sprite.height = renderTexture.height;
+        sprite.width = target.width;
+        sprite.height = target.height;
 
-        return this.writeToRenderTexture(sprite, renderTexture);
+        return this.writeToTexture(sprite, target);
     }
 
-    public static writeToRenderTexture(displayObject: DisplayObject, renderTexture: RenderTexture, clear: boolean = true, transform: Matrix = null): RenderTexture
+    public static writeToTexture(container: Container, target: RenderSurface, clear: boolean = true, transform: Matrix = null): RenderSurface
     {
-        if(!displayObject || !renderTexture) return null;
+        if(!container || !target) return null;
 
-        this.getRenderer().render(displayObject, {
-            renderTexture,
+        this.getRenderer().render({
+            container,
+            target,
             clear,
             transform
         });
 
-        return renderTexture;
+        return target;
     }
 
-    public static getPixels(displayObject: DisplayObject | RenderTexture, frame: Rectangle = null): Uint8Array | Uint8ClampedArray
+    public static getPixels(options: ExtractOptions | Container | Texture): GetPixelsOutput
     {
-        return this.getExtractor().pixels(displayObject);
+        return this.getExtractor().pixels(options);
     }
 
-    public static getRenderer(): IRenderer<ICanvas>
+    public static getRenderer(): Renderer
     {
-        return PixiApplicationProxy.instance.renderer;
+        return GetPixi().renderer;
     }
 
-    public static getExtractor(): IExtract
+    public static getExtractor(): ExtractSystem
     {
         return this.getRenderer().extract;
     }

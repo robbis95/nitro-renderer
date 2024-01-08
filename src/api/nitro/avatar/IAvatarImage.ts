@@ -1,5 +1,4 @@
-import { RenderTexture } from '@pixi/core';
-import { Sprite } from '@pixi/sprite';
+import { Sprite, Texture } from 'pixi.js';
 import { IGraphicAsset } from '../../asset';
 import { IDisposable } from '../../common';
 import { IAvatarFigureContainer } from './IAvatarFigureContainer';
@@ -15,7 +14,7 @@ export interface IAvatarImage extends IDisposable
     getScale(): string;
     getSprites(): ISpriteDataContainer[];
     getLayerData(_arg_1: ISpriteDataContainer): IAnimationLayerData;
-    getImage(setType: string, hightlight: boolean, scale?: number, cache?: boolean): RenderTexture;
+    getImage(setType: string, hightlight: boolean, scale?: number, cache?: boolean): Texture;
     getImageAsSprite(setType: string, scale?: number): Sprite;
     getCroppedImage(setType: string, scale?: number): Promise<HTMLImageElement>;
     getAsset(_arg_1: string): IGraphicAsset;

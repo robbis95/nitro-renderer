@@ -13,15 +13,15 @@ export class AvatarImageBodyPartCache
         this._cache = new Map();
     }
 
-    public setAction(k: IActiveActionData, _arg_2: number): void
+    public setAction(action: IActiveActionData, time: number): void
     {
-        if(!this._currentAction) this._currentAction = k;
+        if(!this._currentAction) this._currentAction = action;
 
-        const _local_3 = this.getActionCache(this._currentAction);
+        const cache = this.getActionCache(this._currentAction);
 
-        if(_local_3) _local_3.setLastAccessTime(_arg_2);
+        if(cache) cache.setLastAccessTime(time);
 
-        this._currentAction = k;
+        this._currentAction = action;
     }
 
     public dispose(): void
@@ -88,9 +88,5 @@ export class AvatarImageBodyPartCache
     {
         if(k.overridingAction) this._cache.set(k.overridingAction, _arg_2);
         else this._cache.set(k.id, _arg_2);
-    }
-
-    private debugInfo(k: string): void
-    {
     }
 }

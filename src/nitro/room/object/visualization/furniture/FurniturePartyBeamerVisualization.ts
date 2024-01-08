@@ -1,4 +1,4 @@
-import { NitroPoint } from '../../../../../pixi-proxy';
+import { Point } from 'pixi.js';
 import { FurnitureAnimatedVisualization } from './FurnitureAnimatedVisualization';
 
 export class FurniturePartyBeamerVisualization extends FurnitureAnimatedVisualization
@@ -13,7 +13,7 @@ export class FurniturePartyBeamerVisualization extends FurnitureAnimatedVisualiz
     private _animDirectionIndex: number[];
     private _animSpeedIndex: number[];
     private _animFactorIndex: number[];
-    private _animOffsetIndex: NitroPoint[];
+    private _animOffsetIndex: Point[];
 
     constructor()
     {
@@ -37,7 +37,7 @@ export class FurniturePartyBeamerVisualization extends FurnitureAnimatedVisualiz
         return super.updateAnimation(scale);
     }
 
-    private getNewPoint(scale: number, layerId: number): NitroPoint
+    private getNewPoint(scale: number, layerId: number): Point
     {
         let diameter = 0;
 
@@ -96,7 +96,7 @@ export class FurniturePartyBeamerVisualization extends FurnitureAnimatedVisualiz
 
         if(Math.trunc(_local_11) == 0) this._animFactorIndex[layerId] = this.getRandomAmplitudeFactor();
 
-        return new NitroPoint(animationPhase, _local_11);
+        return new Point(animationPhase, _local_11);
     }
 
     private initItems(scale: number): void

@@ -1,3 +1,4 @@
+import { BLEND_MODES } from 'pixi.js';
 import { LayerData } from './LayerData';
 
 export class DirectionData
@@ -71,24 +72,22 @@ export class DirectionData
         existing.tag = tag;
     }
 
-    public getLayerInk(layerId: number): number
+    public getLayerBlendMode(layerId: number): BLEND_MODES
     {
         const existing = this.getLayer(layerId);
 
-        if(!existing) return LayerData.DEFAULT_INK;
+        if(!existing) return LayerData.DEFAULT_BLEND_MODE;
 
-        return existing.ink;
+        return existing.blendMode;
     }
 
-    public setLayerInk(layerId: number, ink: number): void
+    public setLayerBlendMode(layerId: number, blendMode: BLEND_MODES): void
     {
         const existing = this.getLayer(layerId);
 
         if(!existing) return;
 
-        if(isNaN(ink)) return;
-
-        existing.ink = ink;
+        existing.blendMode = blendMode;
     }
 
     public getLayerAlpha(layerId: number): number

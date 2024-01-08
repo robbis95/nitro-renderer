@@ -1,9 +1,8 @@
-import { Application } from '@pixi/app';
+import { Application } from 'pixi.js';
 import { IAvatarRenderManager, ICommunicationManager, IConfigurationManager, IEventDispatcher, ILinkEventTracker, ILocalizationManager, IRoomCameraWidgetManager, IRoomEngine, ISessionDataManager, ISoundManager } from '../api';
 
 export interface INitro
 {
-    init(): Promise<void>;
     getConfiguration<T>(key: string, value?: T): T;
     getLocalization(key: string): string;
     getLocalizationWithParameter(key: string, parameter: string, replacement: string): string;

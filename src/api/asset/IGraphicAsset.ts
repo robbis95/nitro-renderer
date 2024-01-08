@@ -1,10 +1,10 @@
-import { Rectangle, Resource, Texture } from '@pixi/core';
+import { Rectangle, Texture } from 'pixi.js';
 
 export interface IGraphicAsset
 {
     name: string;
     source: string;
-    texture: Texture<Resource>;
+    texture: Texture;
     usesPalette: boolean;
     x: number;
     y: number;

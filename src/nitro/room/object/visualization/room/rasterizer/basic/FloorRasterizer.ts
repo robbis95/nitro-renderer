@@ -1,6 +1,6 @@
-﻿import { RenderTexture } from '@pixi/core';
+﻿import { Texture } from 'pixi.js';
 import { IAssetPlane, IVector3D } from '../../../../../../../api';
-import { PlaneTextureCache } from '../../../../../../../pixi-proxy';
+import { PlaneTextureCache, TextureUtils } from '../../../../../../../pixi-proxy';
 import { PlaneBitmapData } from '../../utils';
 import { FloorPlane } from './FloorPlane';
 import { PlaneRasterizer } from './PlaneRasterizer';
@@ -36,7 +36,7 @@ export class FloorRasterizer extends PlaneRasterizer
         }
     }
 
-    public render(planeId: string, textureCache: PlaneTextureCache, canvas: RenderTexture, id: string, width: number, height: number, scale: number, normal: IVector3D, useTexture: boolean, offsetX: number = 0, offsetY: number = 0, maxX: number = 0, maxY: number = 0, timeSinceStartMs: number = 0): PlaneBitmapData
+    public render(planeId: string, textureCache: PlaneTextureCache, canvas: Texture, id: string, width: number, height: number, scale: number, normal: IVector3D, useTexture: boolean, offsetX: number = 0, offsetY: number = 0, maxX: number = 0, maxY: number = 0, timeSinceStartMs: number = 0): PlaneBitmapData
     {
         let plane = this.getPlane(id) as FloorPlane;
 
@@ -44,13 +44,13 @@ export class FloorRasterizer extends PlaneRasterizer
 
         if(!plane) return null;
 
-        if(canvas) textureCache.clearAndFillRenderTexture(canvas);
+        if(canvas) TextureUtils.clearAndFillTexture(canvas);
 
-        let graphic = plane.render(planeId, textureCache, canvas, width, height, scale, normal, useTexture, offsetX, offsetY);
+        const graphic = plane.render(planeId, textureCache, canvas, width, height, scale, normal, useTexture, offsetX, offsetY);
 
         if(graphic && (graphic !== canvas))
         {
-            graphic = new RenderTexture(graphic.baseTexture);
+            //graphic = new RenderTexture(graphic.baseTexture);
 
             if(!graphic) return null;
         }

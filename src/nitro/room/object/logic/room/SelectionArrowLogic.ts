@@ -1,6 +1,6 @@
 import { IAssetData, RoomObjectVariable } from '../../../../../api';
-import { RoomObjectLogicBase, RoomObjectUpdateMessage } from '../../../../../room';
-import { ObjectVisibilityUpdateMessage } from '../../../messages';
+import { ObjectVisibilityUpdateMessage, RoomObjectUpdateMessage } from '../../../messages';
+import { RoomObjectLogicBase } from '../RoomObjectLogicBase';
 
 export class SelectionArrowLogic extends RoomObjectLogicBase
 {

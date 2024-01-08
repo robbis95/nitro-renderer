@@ -1,5 +1,5 @@
 import { Vector3d } from '../../../api';
-import { RoomObjectUpdateMessage } from '../../../room';
+import { RoomObjectUpdateMessage } from './RoomObjectUpdateMessage';
 
 export class ObjectTileCursorUpdateMessage extends RoomObjectUpdateMessage
 {

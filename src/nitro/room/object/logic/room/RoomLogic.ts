@@ -1,13 +1,14 @@
-import { Point } from '@pixi/core';
+import { Point } from 'pixi.js';
 import { IRoomGeometry, IRoomObjectModel, MouseEventType, NitroConfiguration, RoomObjectVariable, Vector3d } from '../../../../../api';
+import { ColorConverter } from '../../../../../common';
 import { RoomObjectEvent, RoomObjectMouseEvent, RoomObjectTileMouseEvent, RoomObjectWallMouseEvent, RoomSpriteMouseEvent } from '../../../../../events';
-import { ColorConverter, RoomObjectLogicBase, RoomObjectUpdateMessage } from '../../../../../room';
-import { ObjectRoomColorUpdateMessage, ObjectRoomFloorHoleUpdateMessage, ObjectRoomMapUpdateMessage, ObjectRoomMaskUpdateMessage, ObjectRoomPlanePropertyUpdateMessage, ObjectRoomPlaneVisibilityUpdateMessage, ObjectRoomUpdateMessage } from '../../../messages';
+import { ObjectRoomColorUpdateMessage, ObjectRoomFloorHoleUpdateMessage, ObjectRoomMapUpdateMessage, ObjectRoomMaskUpdateMessage, ObjectRoomPlanePropertyUpdateMessage, ObjectRoomPlaneVisibilityUpdateMessage, ObjectRoomUpdateMessage, RoomObjectUpdateMessage } from '../../../messages';
 import { RoomMapData } from '../../RoomMapData';
 import { RoomPlaneBitmapMaskData } from '../../RoomPlaneBitmapMaskData';
 import { RoomPlaneBitmapMaskParser } from '../../RoomPlaneBitmapMaskParser';
 import { RoomPlaneData } from '../../RoomPlaneData';
 import { RoomPlaneParser } from '../../RoomPlaneParser';
+import { RoomObjectLogicBase } from '../RoomObjectLogicBase';
 
 export class RoomLogic extends RoomObjectLogicBase
 {

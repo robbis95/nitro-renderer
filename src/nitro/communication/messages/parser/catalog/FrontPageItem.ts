@@ -1,5 +1,5 @@
 import { IMessageDataWrapper } from '../../../../../api';
-import { GetTickerTime } from '../../../../../pixi-proxy';
+import { GetTickerTime } from '../../../../../common';
 
 export class FrontPageItem
 {

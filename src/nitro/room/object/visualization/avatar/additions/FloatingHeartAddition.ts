@@ -1,6 +1,6 @@
-import { Resource, Texture } from '@pixi/core';
+import { Texture } from 'pixi.js';
 import { AvatarAction, IRoomObjectSprite } from '../../../../../../api';
-import { GetTickerTime } from '../../../../../../pixi-proxy';
+import { GetTickerTime } from '../../../../../../common';
 import { AvatarVisualization } from '../AvatarVisualization';
 import { ExpressionAddition } from './ExpressionAddition';
 
@@ -12,7 +12,7 @@ export class FloatingHeartAddition extends ExpressionAddition
     private static STATE_FLOAT: number = 2;
     private static STATE_COMPLETE: number = 3;
 
-    private _asset: Texture<Resource>;
+    private _asset: Texture;
     private _startTime: number;
     private _delta: number;
     private _offsetY: number;

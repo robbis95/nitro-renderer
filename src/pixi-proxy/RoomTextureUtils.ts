@@ -1,15 +1,12 @@
-import { ICanvas, IRenderer, Matrix, Rectangle, RenderTexture, Texture } from '@pixi/core';
-import { DisplayObject } from '@pixi/display';
-import { IExtract } from '@pixi/extract';
-import { Sprite } from '@pixi/sprite';
+import { Container, Matrix, RenderSurface, Texture } from 'pixi.js';
 import { TextureUtils } from './TextureUtils';
 
-export class PlaneTextureCache
+export class PlaneTextureCache extends TextureUtils
 {
     private static DEFAULT_PLANE_ID = 'DEFAULT';
 
-    public RENDER_TEXTURE_POOL: Map<string, RenderTexture> = new Map();
-    public RENDER_TEXTURE_CACHE: RenderTexture[] = [];
+    public RENDER_TEXTURE_POOL: Map<string, Texture> = new Map();
+    public RENDER_TEXTURE_CACHE: RenderSurface[] = [];
 
     public clearCache(): void
     {
@@ -19,93 +16,55 @@ export class PlaneTextureCache
         this.RENDER_TEXTURE_CACHE = [];
     }
 
-    public clearRenderTexture(renderTexture: RenderTexture): RenderTexture
-    {
-        if(!renderTexture) return null;
-
-        return this.writeToRenderTexture(new Sprite(Texture.EMPTY), renderTexture);
-    }
-
     private getTextureIdentifier(width: number, height: number, planeId: string): string
     {
         return `${ planeId ?? PlaneTextureCache.DEFAULT_PLANE_ID }:${ width }:${ height }`;
     }
 
-    public createRenderTexture(width: number, height: number, planeId: string = null): RenderTexture
+    public createTexture(width: number, height: number, planeId: string = null): Texture
     {
         if((width < 0) || (height < 0)) return null;
 
         if(!planeId)
         {
-            const renderTexture = RenderTexture.create({
-                width,
-                height
-            });
+            const texture = TextureUtils.createTexture(width, height);
 
-            this.RENDER_TEXTURE_CACHE.push(renderTexture);
+            this.RENDER_TEXTURE_CACHE.push(texture);
 
-            return renderTexture;
+            return texture;
         }
 
         planeId = this.getTextureIdentifier(width, height, planeId);
 
-        let renderTexture = this.RENDER_TEXTURE_POOL.get(planeId);
+        let texture = this.RENDER_TEXTURE_POOL.get(planeId);
 
-        if(!renderTexture)
+        if(!texture)
         {
-            renderTexture = RenderTexture.create({
-                width,
-                height
-            });
+            texture = TextureUtils.createTexture(width, height);
 
-            this.RENDER_TEXTURE_CACHE.push(renderTexture);
+            this.RENDER_TEXTURE_CACHE.push(texture);
 
-            this.RENDER_TEXTURE_POOL.set(planeId, renderTexture);
+            this.RENDER_TEXTURE_POOL.set(planeId, texture);
         }
 
-        return renderTexture;
+        return texture;
     }
 
-    public createAndFillRenderTexture(width: number, height: number, planeId = null, color: number = 16777215): RenderTexture
+    public createAndFillRenderTexture(width: number, height: number, planeId = null, color: number = 16777215): RenderSurface
     {
         if((width < 0) || (height < 0)) return null;
 
-        const renderTexture = this.createRenderTexture(width, height, planeId);
+        const renderTexture = this.createTexture(width, height, planeId);
 
-        return this.clearAndFillRenderTexture(renderTexture, color);
+        return TextureUtils.clearAndFillTexture(renderTexture, color);
     }
 
-    public createAndWriteRenderTexture(width: number, height: number, displayObject: DisplayObject, planeId: string = null, transform: Matrix = null): RenderTexture
+    public createAndWriteRenderTexture(width: number, height: number, container: Container, planeId: string = null, transform: Matrix = null): RenderSurface
     {
         if((width < 0) || (height < 0)) return null;
 
-        const renderTexture = this.createRenderTexture(width, height, planeId);
+        const renderTexture = this.createTexture(width, height, planeId);
 
-        return this.writeToRenderTexture(displayObject, renderTexture, true, transform);
-    }
-
-    public clearAndFillRenderTexture(renderTexture: RenderTexture, color: number = 16777215): RenderTexture
-    {
-        return TextureUtils.clearAndFillRenderTexture(renderTexture, color);
-    }
-
-    public writeToRenderTexture(displayObject: DisplayObject, renderTexture: RenderTexture, clear: boolean = true, transform: Matrix = null): RenderTexture
-    {
-        return TextureUtils.writeToRenderTexture(displayObject, renderTexture, clear, transform);
-    }
-
-    public getPixels(displayObject: DisplayObject | RenderTexture, frame: Rectangle = null): Uint8Array | Uint8ClampedArray
-    {
-        return TextureUtils.getPixels(displayObject, frame);
-    }
-
-    public getRenderer(): IRenderer<ICanvas>
-    {
-        return TextureUtils.getRenderer();
-    }
-
-    public getExtractor(): IExtract
-    {
-        return TextureUtils.getExtractor();
+        return TextureUtils.writeToTexture(container, renderTexture, true, transform);
     }
 }

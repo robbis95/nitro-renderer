@@ -1,7 +1,7 @@
-import { Rectangle } from '@pixi/core';
+import { Rectangle } from 'pixi.js';
 import { AlphaTolerance, IObjectVisualizationData, IPlaneVisualization, IRoomGeometry, IRoomObjectModel, IRoomObjectSprite, IRoomPlane, RoomObjectSpriteType, RoomObjectVariable, Vector3d } from '../../../../../api';
+import { RoomObjectSpriteVisualization } from '../../../../../common';
 import { PlaneTextureCache } from '../../../../../pixi-proxy';
-import { RoomObjectSpriteVisualization } from '../../../../../room';
 import { ToInt32 } from '../../../../utils';
 import { RoomMapData } from '../../RoomMapData';
 import { RoomMapMaskData } from '../../RoomMapMaskData';

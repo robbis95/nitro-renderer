@@ -1,6 +1,6 @@
 import { IAssetData, RoomObjectVariable } from '../../../../../api';
-import { RoomObjectLogicBase, RoomObjectUpdateMessage } from '../../../../../room';
-import { ObjectTileCursorUpdateMessage } from '../../../messages';
+import { ObjectTileCursorUpdateMessage, RoomObjectUpdateMessage } from '../../../messages';
+import { RoomObjectLogicBase } from '../RoomObjectLogicBase';
 
 export class TileCursorLogic extends RoomObjectLogicBase
 {

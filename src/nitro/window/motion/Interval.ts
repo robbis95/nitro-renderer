@@ -1,4 +1,4 @@
-﻿import { GetTickerTime } from '../../../pixi-proxy';
+﻿import { GetTickerTime } from '../../../common';
 import { Motion } from './Motion';
 
 export class Interval extends Motion

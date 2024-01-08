@@ -1,7 +1,6 @@
 import { IAssetData, RoomObjectVariable } from '../../../../../api';
 import { RoomObjectWidgetRequestEvent } from '../../../../../events';
-import { RoomObjectUpdateMessage } from '../../../../../room';
-import { ObjectDataUpdateMessage } from '../../../messages';
+import { ObjectDataUpdateMessage, RoomObjectUpdateMessage } from '../../../messages';
 import { FurnitureLogic } from './FurnitureLogic';
 
 export class FurnitureClothingChangeLogic extends FurnitureLogic

@@ -1,9 +1,8 @@
-import { BLEND_MODES } from '@pixi/constants';
-import { Resource, Texture } from '@pixi/core';
+import { Texture } from 'pixi.js';
 import { AdvancedMap, AlphaTolerance, AvatarAction, AvatarGuideStatus, AvatarSetType, IAdvancedMap, IAvatarEffectListener, IAvatarImage, IAvatarImageListener, IGraphicAsset, IObjectVisualizationData, IRoomGeometry, IRoomObject, IRoomObjectModel, RoomObjectSpriteType, RoomObjectVariable } from '../../../../../api';
-import { RoomObjectSpriteVisualization } from '../../../../../room';
-import { ExpressionAdditionFactory, FloatingIdleZAddition, GameClickTargetAddition, GuideStatusBubbleAddition, IAvatarAddition, MutedBubbleAddition, NumberBubbleAddition, TypingBubbleAddition } from './additions';
+import { RoomObjectSpriteVisualization } from '../../../../../common';
 import { AvatarVisualizationData } from './AvatarVisualizationData';
+import { ExpressionAdditionFactory, FloatingIdleZAddition, GameClickTargetAddition, GuideStatusBubbleAddition, IAvatarAddition, MutedBubbleAddition, NumberBubbleAddition, TypingBubbleAddition } from './additions';
 
 export class AvatarVisualization extends RoomObjectSpriteVisualization implements IAvatarImageListener, IAvatarEffectListener
 {
@@ -438,8 +437,8 @@ export class AvatarVisualization extends RoomObjectSpriteVisualization implement
                             sprite.relativeDepth = (AvatarVisualization.AVATAR_SPRITE_DEFAULT_DEPTH - ((0.001 * this.totalSprites) * offsetZ));
                         }
 
-                        if(spriteData.ink === 33) sprite.blendMode = BLEND_MODES.ADD;
-                        else sprite.blendMode = BLEND_MODES.NORMAL;
+                        if(spriteData.ink === 33) sprite.blendMode = 'add';
+                        else sprite.blendMode = 'normal';
                     }
 
                     _local_21++;
@@ -1108,7 +1107,7 @@ export class AvatarVisualization extends RoomObjectSpriteVisualization implement
         }
     }
 
-    public getAvatarRenderAsset(name: string): Texture<Resource>
+    public getAvatarRenderAsset(name: string): Texture
     {
         return this._data ? this._data.getAvatarRendererAsset(name) : null;
     }

@@ -1,4 +1,4 @@
-import { NitroPoint, NitroTexture } from '../../../pixi-proxy';
+import { Point, Texture } from 'pixi.js';
 
 export class GroupBadgePart
 {
@@ -37,7 +37,7 @@ export class GroupBadgePart
         return (type === GroupBadgePart.BASE ? type : key >= 100 ? GroupBadgePart.SYMBOL_ALT : GroupBadgePart.SYMBOL) + (key < 10 ? '0' : '') + (type === GroupBadgePart.BASE ? key : key >= 100 ? key - 100 : key) + (color < 10 ? '0' : '') + color + position;
     }
 
-    public calculatePosition(asset: NitroTexture): NitroPoint
+    public calculatePosition(asset: Texture): Point
     {
         const gridPos = this.calculateGridPos(this.position);
 
@@ -52,12 +52,12 @@ export class GroupBadgePart
 
         if((y + asset.height) > GroupBadgePart.IMAGE_HEIGHT) y = (GroupBadgePart.IMAGE_HEIGHT - asset.height);
 
-        return new NitroPoint(Math.floor(x), Math.floor(y));
+        return new Point(Math.floor(x), Math.floor(y));
     }
 
-    private calculateGridPos(gridVal: number): NitroPoint
+    private calculateGridPos(gridVal: number): Point
     {
-        const point = new NitroPoint();
+        const point = new Point();
         point.x = Math.floor((gridVal % 3));
         point.y = Math.floor((gridVal / 3));
 

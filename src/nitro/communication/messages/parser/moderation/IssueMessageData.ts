@@ -1,4 +1,4 @@
-import { GetTickerTime } from '../../../../../pixi-proxy';
+import { GetTickerTime } from '../../../../../common';
 import { PatternMatchData } from './PatternMatchData';
 
 export class IssueMessageData
@@ -47,7 +47,7 @@ export class IssueMessageData
         this._message = message;
         this._chatRecordId = chatRecordId;
         this._patterns = patterns;
-        this._creationTimeInMilliseconds = GetTickerTime(); //getTimer()
+        this._creationTimeInMilliseconds = GetTickerTime();
     }
 
     public get issueId(): number

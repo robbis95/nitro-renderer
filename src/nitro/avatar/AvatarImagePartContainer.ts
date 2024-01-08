@@ -1,5 +1,4 @@
 ﻿import { IActionDefinition, IPartColor } from '../../api';
-import { AdjustmentFilter } from '../../pixi-proxy';
 import { AvatarAnimationFrame } from './structure';
 
 export class AvatarImagePartContainer
@@ -13,7 +12,6 @@ export class AvatarImagePartContainer
     private _action: IActionDefinition;
     private _isColorable: boolean;
     private _isBlendable: boolean;
-    private _blendTransform: AdjustmentFilter;
     private _paletteMapId: number;
 
     constructor(bodyPartId: string, partType: string, partId: string, partColor: IPartColor, frames: AvatarAnimationFrame[], action: IActionDefinition, isColorable: boolean, paletteMapId: number, flippedPartType: string = '', isBlendable: boolean = false, _arg_11: number = 1)
@@ -28,7 +26,6 @@ export class AvatarImagePartContainer
         this._paletteMapId = paletteMapId;
         this._flippedPartType = flippedPartType;
         this._isBlendable = isBlendable;
-        this._blendTransform = null;
 
         if(this._partType === 'ey') this._isColorable = false;
     }

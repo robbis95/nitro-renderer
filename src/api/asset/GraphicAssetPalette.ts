@@ -1,6 +1,5 @@
-import { Renderer, Resource, Texture } from '@pixi/core';
-import { Sprite } from '@pixi/sprite';
-import { PixiApplicationProxy, TextureUtils } from '../../pixi-proxy';
+import { Sprite, Texture } from 'pixi.js';
+import { TextureUtils } from '../../pixi-proxy';
 
 export class GraphicAssetPalette
 {
@@ -23,10 +22,10 @@ export class GraphicAssetPalette
 
     }
 
-    public applyPalette(texture: Texture<Resource>): Texture<Resource>
+    public applyPalette(texture: Texture): Texture
     {
         const renderTexture = TextureUtils.createAndWriteRenderTexture(texture.width, texture.height, new Sprite(texture));
-        const pixels = TextureUtils.getPixels(renderTexture);
+        /* const pixels = TextureUtils.getPixels(renderTexture);
 
         for(let i = 0; i < pixels.length; i += 4)
         {
@@ -44,9 +43,9 @@ export class GraphicAssetPalette
 
         gl.bindTexture(gl.TEXTURE_2D, canvaGLTexture);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, renderTexture.width, renderTexture.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
-        gl.bindTexture(gl.TEXTURE_2D, null);
+        gl.bindTexture(gl.TEXTURE_2D, null); */
 
-        return renderTexture;
+        return (renderTexture as Texture);
     }
 
     public get primaryColor(): number

@@ -1,7 +1,7 @@
-import { ISpritesheetData as PixiSpritesheet } from '@pixi/spritesheet';
+import { SpritesheetData } from 'pixi.js';
 import { ISpritesheetMeta } from './ISpritesheetMeta';
 
-export interface ISpritesheetData extends PixiSpritesheet
+export interface ISpritesheetData extends SpritesheetData
 {
     meta: ISpritesheetMeta;
 }

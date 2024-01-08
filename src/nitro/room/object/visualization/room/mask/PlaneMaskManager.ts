@@ -1,7 +1,6 @@
-﻿import { Matrix, Point, RenderTexture } from '@pixi/core';
-import { Sprite } from '@pixi/sprite';
+﻿import { Matrix, Point, Sprite, Texture } from 'pixi.js';
 import { IAssetPlaneMaskData, IAssetPlaneTextureBitmap, IGraphicAssetCollection, IVector3D } from '../../../../../../api';
-import { PixiApplicationProxy } from '../../../../../../pixi-proxy';
+import { TextureUtils } from '../../../../../../pixi-proxy';
 import { PlaneMask } from './PlaneMask';
 import { PlaneMaskVisualization } from './PlaneMaskVisualization';
 
@@ -142,7 +141,7 @@ export class PlaneMaskManager
         return graphicName;
     }
 
-    public updateMask(canvas: RenderTexture, type: string, scale: number, normal: IVector3D, posX: number, posY: number): boolean
+    public updateMask(canvas: Texture, type: string, scale: number, normal: IVector3D, posX: number, posY: number): boolean
     {
         const mask = this._masks.get(type);
 
@@ -186,11 +185,7 @@ export class PlaneMaskManager
         matrix.scale(xScale, ySkew);
         matrix.translate(tx, ty);
 
-        PixiApplicationProxy.instance.renderer.render(new Sprite(texture), {
-            renderTexture: canvas,
-            clear: false,
-            transform: matrix
-        });
+        TextureUtils.writeToTexture(new Sprite(texture), canvas, false, matrix);
 
         return true;
     }

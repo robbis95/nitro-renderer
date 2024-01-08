@@ -1,5 +1,4 @@
-import { BaseTexture, Resource, Texture } from '@pixi/core';
-import { Spritesheet } from '@pixi/spritesheet';
+import { Assets, Spritesheet, Texture } from 'pixi.js';
 import { NitroLogger } from '../common';
 import { ArrayBufferToBase64, NitroBundle } from '../utils';
 import { GraphicAssetCollection } from './GraphicAssetCollection';
@@ -7,15 +6,16 @@ import { IAssetData } from './IAssetData';
 import { IAssetManager } from './IAssetManager';
 import { IGraphicAsset } from './IGraphicAsset';
 import { IGraphicAssetCollection } from './IGraphicAssetCollection';
+import { ISpritesheetData } from './spritesheet';
 
 export class AssetManager implements IAssetManager
 {
     public static _INSTANCE: IAssetManager = new AssetManager();
 
-    private _textures: Map<string, Texture<Resource>> = new Map();
+    private _textures: Map<string, Texture> = new Map();
     private _collections: Map<string, IGraphicAssetCollection> = new Map();
 
-    public getTexture(name: string): Texture<Resource>
+    public getTexture(name: string): Texture
     {
         if(!name) return null;
 
@@ -26,7 +26,7 @@ export class AssetManager implements IAssetManager
         return existing;
     }
 
-    public setTexture(name: string, texture: Texture<Resource>): void
+    public setTexture(name: string, texture: Texture): void
     {
         if(!name || !texture) return;
 
@@ -106,46 +106,21 @@ export class AssetManager implements IAssetManager
                 {
                     case 'application/octet-stream': {
                         const buffer = await response.arrayBuffer();
-                        const nitroBundle = new NitroBundle(buffer);
+                        const nitroBundle = await NitroBundle.from(buffer);
 
                         await this.processAsset(
-                            nitroBundle.baseTexture,
-                            nitroBundle.jsonFile as IAssetData
+                            nitroBundle.texture,
+                            nitroBundle.file as IAssetData
                         );
                         break;
                     }
                     case 'image/png':
-                    case 'image/jpeg':
-                    case 'image/gif': {
+                    case 'image/jpeg': {
                         const buffer = await response.arrayBuffer();
                         const base64 = ArrayBufferToBase64(buffer);
-                        const baseTexture = BaseTexture.from(
-                            `data:${ contentType };base64,${ base64 }`
-                        );
+                        const texture = await Assets.load(`data:${ contentType };base64,${ base64 }`);
 
-                        const createAsset = async () =>
-                        {
-                            const texture = new Texture(baseTexture);
-                            this.setTexture(url, texture);
-                        };
-
-                        if(baseTexture.valid)
-                        {
-                            await createAsset();
-                        }
-                        else
-                        {
-                            await new Promise<void>((resolve, reject) =>
-                            {
-                                baseTexture.once('update', async () =>
-                                {
-                                    await createAsset();
-
-                                    return resolve();
-                                });
-                            });
-                        }
-                        break;
+                        this.setTexture(url, texture);
                     }
                 }
             }
@@ -160,42 +135,18 @@ export class AssetManager implements IAssetManager
         }
     }
 
-    private async processAsset(baseTexture: BaseTexture, data: IAssetData): Promise<void>
+    private async processAsset(texture: Texture, data: IAssetData): Promise<void>
     {
-        const spritesheetData = data.spritesheet;
+        let spritesheet: Spritesheet<ISpritesheetData> = null;
 
-        if(!baseTexture || !spritesheetData || !Object.keys(spritesheetData).length)
+        if(texture && data?.spritesheet && Object.keys(data.spritesheet).length)
         {
-            this.createCollection(data, null);
-
-            return;
-        }
-
-        const createAsset = async () =>
-        {
-            const spritesheet = new Spritesheet(baseTexture, spritesheetData);
+            spritesheet = new Spritesheet(texture, data.spritesheet);
 
             await spritesheet.parse();
-
-            this.createCollection(data, spritesheet);
-        };
-
-        if(baseTexture.valid)
-        {
-            await createAsset();
         }
-        else
-        {
-            await new Promise<void>((resolve, reject) =>
-            {
-                baseTexture.once('update', async () =>
-                {
-                    await createAsset();
 
-                    return resolve();
-                });
-            });
-        }
+        this.createCollection(data, spritesheet);
     }
 
     public get collections(): Map<string, IGraphicAssetCollection>

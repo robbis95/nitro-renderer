@@ -1,7 +1,6 @@
-﻿import { RenderTexture } from '@pixi/core';
-import { Sprite } from '@pixi/sprite';
+﻿import { Sprite, Texture } from 'pixi.js';
 import { IVector3D } from '../../../../../../../api';
-import { PlaneTextureCache } from '../../../../../../../pixi-proxy';
+import { PlaneTextureCache, TextureUtils } from '../../../../../../../pixi-proxy';
 import { PlaneMaterial } from './PlaneMaterial';
 
 export class PlaneVisualizationLayer
@@ -53,7 +52,7 @@ export class PlaneVisualizationLayer
     {
     }
 
-    public render(planeId: string, textureCache: PlaneTextureCache, canvas: RenderTexture, width: number, height: number, normal: IVector3D, useTexture: boolean, offsetX: number, offsetY: number): RenderTexture
+    public render(planeId: string, textureCache: PlaneTextureCache, canvas: Texture, width: number, height: number, normal: IVector3D, useTexture: boolean, offsetX: number, offsetY: number): Texture
     {
         const r = (this._color >> 16);
         const g = ((this._color >> 8) & 0xFF);
@@ -70,14 +69,14 @@ export class PlaneVisualizationLayer
 
                 if(hasColor) sprite.tint = this._color;
 
-                textureCache.writeToRenderTexture(sprite, canvas, false);
+                TextureUtils.writeToTexture(sprite, canvas, false);
             }
         }
         else
         {
-            const bitmapData = textureCache.createAndFillRenderTexture(width, height, planeId, this._color);
+            const bitmapData = textureCache.createAndFillRenderTexture(width, height, planeId, this._color) as Texture;
 
-            textureCache.writeToRenderTexture(new Sprite(bitmapData), canvas, false);
+            TextureUtils.writeToTexture(new Sprite(bitmapData), canvas, false);
         }
 
         return canvas;

@@ -1,4 +1,4 @@
-import { RoomObjectSpriteVisualization } from '../../../../../room';
+import { RoomObjectSpriteVisualization } from '../../../../../common';
 
 export class FurnitureCuboidVisualization extends RoomObjectSpriteVisualization
 {

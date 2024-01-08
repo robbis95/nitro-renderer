@@ -1,6 +1,6 @@
-﻿import { Point, Rectangle } from '@pixi/core';
+﻿import { Point, Rectangle } from 'pixi.js';
 import { IPlaneDrawingData, IPlaneVisualization, IRoomObjectSpriteVisualization, IRoomPlane, IRoomRenderingCanvas, RoomObjectCategory, RoomObjectSpriteData, Vector3d } from '../../../api';
-import { PixiApplicationProxy } from '../../../pixi-proxy';
+import { GetPixi } from '../../../common';
 import { RoomEngine } from '../RoomEngine';
 import { PlaneDrawingData } from '../object';
 
@@ -389,7 +389,7 @@ export class SpriteDataCollector
         {
             const _local_8 = _arg_2.geometry;
             const _local_9 = this.sortRoomPlanes(visualization.planes, _arg_2, _arg_3);
-            const _local_10 = PixiApplicationProxy.instance.stage;
+            const _local_10 = GetPixi().stage;
 
             for(const _local_11 of _local_9)
             {

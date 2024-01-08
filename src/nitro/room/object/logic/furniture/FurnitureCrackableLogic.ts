@@ -1,5 +1,5 @@
 import { RoomObjectVariable, RoomWidgetEnumItemExtradataParameter } from '../../../../../api';
-import { RoomObjectUpdateMessage } from '../../../../../room';
+import { RoomObjectUpdateMessage } from '../../../messages';
 import { FurnitureLogic } from './FurnitureLogic';
 
 export class FurnitureCrackableLogic extends FurnitureLogic

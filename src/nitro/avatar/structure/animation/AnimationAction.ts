@@ -1,4 +1,4 @@
-import { Point } from '@pixi/core';
+import { Point } from 'pixi.js';
 import { AnimationActionPart } from './AnimationActionPart';
 
 export class AnimationAction

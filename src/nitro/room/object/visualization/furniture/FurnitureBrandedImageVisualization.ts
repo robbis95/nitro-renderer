@@ -1,6 +1,5 @@
-import { Resource, Texture } from '@pixi/core';
+import { Texture } from 'pixi.js';
 import { GetAssetManager, GraphicAssetGifCollection, RoomObjectVariable } from '../../../../../api';
-import { Nitro } from '../../../../Nitro';
 import { FurnitureVisualization } from './FurnitureVisualization';
 
 export class FurnitureBrandedImageVisualization extends FurnitureVisualization
@@ -14,14 +13,11 @@ export class FurnitureBrandedImageVisualization extends FurnitureVisualization
     protected _imageUrl: string;
     protected _shortUrl: string;
     protected _imageReady: boolean;
-    protected _isAnimated: boolean;
     protected _gifCollection: GraphicAssetGifCollection;
 
     protected _offsetX: number;
     protected _offsetY: number;
     protected _offsetZ: number;
-    protected _currentFrame: number;
-    protected _totalFrames: number;
 
     constructor()
     {
@@ -30,14 +26,11 @@ export class FurnitureBrandedImageVisualization extends FurnitureVisualization
         this._imageUrl = null;
         this._shortUrl = null;
         this._imageReady = false;
-        this._isAnimated = false;
         this._gifCollection = null;
 
         this._offsetX = 0;
         this._offsetY = 0;
         this._offsetZ = 0;
-        this._currentFrame = -1;
-        this._totalFrames = -1;
     }
 
     public dispose(): void
@@ -69,7 +62,6 @@ export class FurnitureBrandedImageVisualization extends FurnitureVisualization
             this._offsetX = (this.object.model.getValue<number>(RoomObjectVariable.FURNITURE_BRANDING_OFFSET_X) || 0);
             this._offsetY = (this.object.model.getValue<number>(RoomObjectVariable.FURNITURE_BRANDING_OFFSET_Y) || 0);
             this._offsetZ = (this.object.model.getValue<number>(RoomObjectVariable.FURNITURE_BRANDING_OFFSET_Z) || 0);
-            this._isAnimated = (this.object.model.getValue<boolean>(RoomObjectVariable.FURNITURE_BRANDING_IS_ANIMATED) || false);
         }
 
         if(!this._imageReady)
@@ -131,23 +123,7 @@ export class FurnitureBrandedImageVisualization extends FurnitureVisualization
 
         if(imageStatus === 1)
         {
-            let texture: Texture = null;
-
-            if(this._isAnimated)
-            {
-                const gifCollection = Nitro.instance.roomEngine.roomContentLoader.getGifCollection(imageUrl);
-
-                if(gifCollection)
-                {
-                    this._gifCollection = gifCollection;
-
-                    texture = gifCollection.textures[0];
-                }
-            }
-            else
-            {
-                texture = GetAssetManager().getTexture(imageUrl);
-            }
+            const texture: Texture = GetAssetManager().getTexture(imageUrl);
 
             if(!texture) return false;
 
@@ -159,7 +135,7 @@ export class FurnitureBrandedImageVisualization extends FurnitureVisualization
         return false;
     }
 
-    protected imageReady(texture: Texture<Resource>, imageUrl: string): void
+    protected imageReady(texture: Texture, imageUrl: string): void
     {
         if(!texture)
         {
@@ -173,13 +149,6 @@ export class FurnitureBrandedImageVisualization extends FurnitureVisualization
 
     protected checkAndCreateImageForCurrentState(): void
     {
-        if(this._isAnimated)
-        {
-            this.buildAssetsForGif();
-
-            return;
-        }
-
         if(!this._imageUrl) return;
 
         const texture = GetAssetManager().getTexture(this._imageUrl);
@@ -191,32 +160,7 @@ export class FurnitureBrandedImageVisualization extends FurnitureVisualization
         this.addBackgroundAsset(texture, state, 0);
     }
 
-    protected buildAssetsForGif(): void
-    {
-        if(!this._gifCollection) return;
-
-        const textures = this._gifCollection.textures;
-        const durations = this._gifCollection.durations;
-
-        if(!textures.length || !durations.length || (textures.length !== durations.length)) return;
-
-        const state = this.object.getState(0);
-
-        for(let i = 0; i < textures.length; i++)
-        {
-            const texture = textures[i];
-            const duration = durations[i];
-
-            if(!texture) continue;
-
-            this.addBackgroundAsset(texture, state, i);
-        }
-
-        this._currentFrame = -1;
-        this._totalFrames = textures.length;
-    }
-
-    protected addBackgroundAsset(texture: Texture<Resource>, state: number, frame: number): void
+    protected addBackgroundAsset(texture: Texture, state: number, frame: number): void
     {
         let x = 0;
         let y = 0;
@@ -252,53 +196,5 @@ export class FurnitureBrandedImageVisualization extends FurnitureVisualization
         }
 
         this.asset.addAsset(`${this._imageUrl}_${frame}`, texture, true, x, y, flipH, flipV);
-    }
-
-    protected getSpriteAssetName(scale: number, layerId: number): string
-    {
-        const tag = this.getLayerTag(scale, this._direction, layerId);
-
-        if((tag === FurnitureBrandedImageVisualization.BRANDED_IMAGE) && this._imageUrl)
-        {
-            return `${this._imageUrl}_${this.getFrameNumber(scale, layerId)}`;
-        }
-
-        return super.getSpriteAssetName(scale, layerId);
-    }
-
-    protected updateAnimation(scale: number): number
-    {
-        if(!this._imageReady || !this._isAnimated || (this._totalFrames <= 0)) return 0;
-
-        return 1;
-    }
-
-    protected getFrameNumber(scale: number, layerId: number): number
-    {
-        if(!this._imageReady || !this._isAnimated || (this._totalFrames <= 0)) return 0;
-
-        const tag = this.getLayerTag(scale, this._direction, layerId);
-
-        if((tag === FurnitureBrandedImageVisualization.BRANDED_IMAGE) && this._imageUrl)
-        {
-            let newFrame = this._currentFrame;
-
-            if(newFrame < 0)
-            {
-                newFrame = 0;
-            }
-            else
-            {
-                newFrame += 1;
-            }
-
-            if(newFrame === this._totalFrames) newFrame = 0;
-
-            this._currentFrame = newFrame;
-
-            return this._currentFrame;
-        }
-
-        return 0;
     }
 }

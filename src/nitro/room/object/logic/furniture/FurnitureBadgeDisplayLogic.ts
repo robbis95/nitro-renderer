@@ -1,8 +1,7 @@
 import { RoomObjectVariable, StringDataType } from '../../../../../api';
+import { GetTickerTime } from '../../../../../common';
 import { RoomObjectBadgeAssetEvent, RoomObjectWidgetRequestEvent } from '../../../../../events';
-import { GetTickerTime } from '../../../../../pixi-proxy';
-import { RoomObjectUpdateMessage } from '../../../../../room';
-import { ObjectDataUpdateMessage, ObjectGroupBadgeUpdateMessage } from '../../../messages';
+import { ObjectDataUpdateMessage, ObjectGroupBadgeUpdateMessage, RoomObjectUpdateMessage } from '../../../messages';
 import { FurnitureLogic } from './FurnitureLogic';
 
 export class FurnitureBadgeDisplayLogic extends FurnitureLogic

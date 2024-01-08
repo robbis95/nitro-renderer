@@ -1,12 +1,22 @@
-import { Application, IApplicationOptions } from '@pixi/app';
-import { SCALE_MODES } from '@pixi/constants';
-import { BaseTexture, TextureGCSystem, settings } from '@pixi/core';
+import { Application } from 'pixi.js';
+import 'pixi.js/accessibility';
+import 'pixi.js/app';
+import 'pixi.js/events';
+import 'pixi.js/filters';
+import 'pixi.js/graphics';
+import 'pixi.js/mesh';
+import 'pixi.js/rendering';
+import 'pixi.js/sprite-nine-slice';
+import 'pixi.js/sprite-tiling';
+import 'pixi.js/spritesheet';
+import 'pixi.js/text';
+import 'pixi.js/text-bitmap';
+import 'pixi.js/text-html';
 import { AssetManager, IAvatarRenderManager, ICommunicationManager, IConfigurationManager, IEventDispatcher, ILinkEventTracker, ILocalizationManager, IRoomCameraWidgetManager, IRoomEngine, ISessionDataManager, ISoundManager, NitroConfiguration, NitroLogger } from '../api';
+import { GetPixi, GetTicker } from '../common';
 import { EventDispatcher } from '../events';
-import { GetTicker, PixiApplicationProxy } from '../pixi-proxy';
 import { INitro } from './INitro';
 import { NitroVersion } from './NitroVersion';
-import './Plugins';
 import { AvatarRenderManager } from './avatar';
 import { RoomCameraWidgetManager } from './camera';
 import { CommunicationManager } from './communication';
@@ -21,10 +31,10 @@ import { HabboWebTools } from './utils/HabboWebTools';
 
 LegacyExternalInterface.available;
 
-BaseTexture.defaultOptions.scaleMode = (!(window.devicePixelRatio % 1)) ? SCALE_MODES.NEAREST : SCALE_MODES.LINEAR;
+/* BaseTexture.defaultOptions.scaleMode = (!(window.devicePixelRatio % 1)) ? SCALE_MODES.NEAREST : SCALE_MODES.LINEAR;
 TextureGCSystem.defaultMaxIdle = 120;
 
-settings.ROUND_PIXELS = true;
+settings.ROUND_PIXELS = true; */
 
 export class Nitro implements INitro
 {
@@ -46,53 +56,52 @@ export class Nitro implements INitro
     private _soundManager: ISoundManager = new SoundManager();
     private _linkTrackers: ILinkEventTracker[] = [];
 
-    constructor(options?: Partial<IApplicationOptions>)
+    constructor()
     {
         if(!Nitro.INSTANCE) Nitro.INSTANCE = this;
-
-        this._application = new PixiApplicationProxy(options);
     }
 
-    public static bootstrap(): void
+    public static async bootstrap(): Promise<Nitro>
     {
         NitroVersion.sayHello();
 
-        const canvas = document.createElement('canvas');
-
-        new this({
-            autoDensity: false,
-            width: window.innerWidth,
-            height: window.innerHeight,
-            view: canvas
-        });
-    }
-
-    public async init(): Promise<void>
-    {
         try
         {
-            await this._configuration.init();
+            await GetPixi().init({
+                autoStart: false,
+                autoDensity: false,
+                width: window.innerWidth,
+                height: window.innerHeight,
+                resizeTo: window,
+                sharedTicker: true
+            });
 
-            this.setDefaultConfiguration();
+            const nitro = new this();
+
+            await nitro._configuration.init();
+
+            nitro.setDefaultConfiguration();
 
             await Promise.all([
-                this._localization.init(),
+                nitro._localization.init(),
                 AssetManager._INSTANCE.downloadAssets(NitroConfiguration.getValue<string[]>('preload.assets.urls')?.map(url => NitroConfiguration.interpolate(url))),
-                this._communication.init(),
-                this._avatar.init(),
-                this._soundManager.init(),
-                this._sessionDataManager.init()
+                nitro._communication.init(),
+                nitro._avatar.init(),
+                nitro._soundManager.init(),
+                nitro._sessionDataManager.init()
             ]);
 
-            await this._roomEngine.init();
+            await nitro._roomEngine.init();
 
-            new GameMessageHandler(this._communication.connection);
+            new GameMessageHandler(nitro._communication.connection);
 
             if(LegacyExternalInterface.available) LegacyExternalInterface.call('legacyTrack', 'authentication', 'authok', []);
 
             HabboWebTools.sendHeartBeat();
 
             setInterval(() => HabboWebTools.sendHeartBeat(), 10000);
+
+            return nitro;
         }
 
         catch (err)

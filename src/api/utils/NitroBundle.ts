@@ -1,5 +1,5 @@
-import { BaseTexture } from '@pixi/core';
 import { Data, inflate } from 'pako';
+import { Assets, Texture } from 'pixi.js';
 import { ArrayBufferToBase64 } from './ArrayBufferToBase64';
 import { BinaryReader } from './BinaryReader';
 
@@ -7,19 +7,21 @@ export class NitroBundle
 {
     private static TEXT_DECODER: TextDecoder = new TextDecoder('utf-8');
 
-    private _jsonFile: Object = null;
-    private _image: string = null;
-    private _imageData: Uint8Array = null;
-    private _baseTexture: BaseTexture = null;
+    private _file: Object = null;
+    private _texture: Texture = null;
 
-    constructor(arrayBuffer: ArrayBuffer)
+    public static async from(buffer: ArrayBuffer): Promise<NitroBundle>
     {
-        this.parse(arrayBuffer);
+        const bundle = new NitroBundle();
+
+        await bundle.parse(buffer);
+
+        return bundle;
     }
 
-    public parse(arrayBuffer: ArrayBuffer): void
+    private async parse(buffer: ArrayBuffer): Promise<void>
     {
-        const binaryReader = new BinaryReader(arrayBuffer);
+        const binaryReader = new BinaryReader(buffer);
 
         let fileCount = binaryReader.readShort();
 
@@ -34,27 +36,27 @@ export class NitroBundle
             {
                 const decompressed = inflate((buffer.toArrayBuffer() as Data));
 
-                this._jsonFile = JSON.parse(NitroBundle.TEXT_DECODER.decode(decompressed));
+                this._file = JSON.parse(NitroBundle.TEXT_DECODER.decode(decompressed));
             }
             else
             {
                 const decompressed = inflate((buffer.toArrayBuffer() as Data));
                 const base64 = ArrayBufferToBase64(decompressed);
 
-                this._baseTexture = new BaseTexture('data:image/png;base64,' + base64);
+                this._texture = await Assets.load<Texture>(`data:image/png;base64,${ base64 }`);
             }
 
             fileCount--;
         }
     }
 
-    get jsonFile(): Object
+    public get file(): Object
     {
-        return this._jsonFile;
+        return this._file;
     }
 
-    public get baseTexture(): BaseTexture
+    public get texture(): Texture
     {
-        return this._baseTexture;
+        return this._texture;
     }
 }

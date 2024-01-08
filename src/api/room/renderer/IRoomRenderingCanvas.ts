@@ -1,6 +1,4 @@
-import { Point, RenderTexture } from '@pixi/core';
-import { Container } from '@pixi/display';
-import { Sprite } from '@pixi/sprite';
+import { Container, Point, Sprite, Texture } from 'pixi.js';
 import { IRoomGeometry } from '../IRoomGeometry';
 import { RoomObjectSpriteData } from '../RoomObjectSpriteData';
 import { ISortableSprite } from '../object';
@@ -20,7 +18,7 @@ export interface IRoomRenderingCanvas
     getPlaneSortableSprites(): ISortableSprite[];
     handleMouseEvent(x: number, y: number, type: string, altKey: boolean, ctrlKey: boolean, shiftKey: boolean, buttonDown: boolean): boolean;
     getSortableSpriteList(): RoomObjectSpriteData[];
-    getDisplayAsTexture(): RenderTexture;
+    getDisplayAsTexture(): Texture;
     moveLeft(): void;
     moveRight(): void;
     moveUp(): void;

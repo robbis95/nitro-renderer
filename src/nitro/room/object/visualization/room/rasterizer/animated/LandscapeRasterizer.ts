@@ -1,6 +1,6 @@
-﻿import { RenderTexture } from '@pixi/core';
+﻿import { Texture } from 'pixi.js';
 import { IAssetPlane, IAssetPlaneVisualizationAnimatedLayer, IAssetPlaneVisualizationLayer, IVector3D } from '../../../../../../../api';
-import { PlaneTextureCache } from '../../../../../../../pixi-proxy';
+import { PlaneTextureCache, TextureUtils } from '../../../../../../../pixi-proxy';
 import { PlaneBitmapData, Randomizer } from '../../utils';
 import { PlaneMaterial, PlaneRasterizer, PlaneVisualizationLayer } from '../basic';
 import { LandscapePlane } from './LandscapePlane';
@@ -14,7 +14,7 @@ export class LandscapeRasterizer extends PlaneRasterizer
 
     private _landscapeWidth: number = 0;
     private _landscapeHeight: number = 0;
-    private _cachedBitmap: RenderTexture = null;
+    private _cachedBitmap: Texture = null;
 
     public initializeDimensions(k: number, _arg_2: number): boolean
     {
@@ -184,7 +184,7 @@ export class LandscapeRasterizer extends PlaneRasterizer
         return _local_3;
     }
 
-    public render(planeId: string, textureCache: PlaneTextureCache, canvas: RenderTexture, id: string, width: number, height: number, scale: number, normal: IVector3D, useTexture: boolean, offsetX: number = 0, offsetY: number = 0, maxX: number = 0, maxY: number = 0, timeSinceStartMs: number = 0): PlaneBitmapData
+    public render(planeId: string, textureCache: PlaneTextureCache, canvas: Texture, id: string, width: number, height: number, scale: number, normal: IVector3D, useTexture: boolean, offsetX: number = 0, offsetY: number = 0, maxX: number = 0, maxY: number = 0, timeSinceStartMs: number = 0): PlaneBitmapData
     {
         let plane = this.getPlane(id) as LandscapePlane;
 
@@ -192,13 +192,13 @@ export class LandscapeRasterizer extends PlaneRasterizer
 
         if(!plane) return null;
 
-        if(canvas) textureCache.clearRenderTexture(canvas);
+        if(canvas) TextureUtils.clearTexture(canvas);
 
-        let graphic = plane.render(planeId,textureCache, canvas, width, height, scale, normal, useTexture, offsetX, offsetY, maxX, maxY, timeSinceStartMs);
+        const graphic = plane.render(planeId,textureCache, canvas, width, height, scale, normal, useTexture, offsetX, offsetY, maxX, maxY, timeSinceStartMs);
 
         if(graphic && (graphic !== canvas))
         {
-            graphic = new RenderTexture(graphic.baseTexture);
+            // graphic = new RenderTexture(graphic.baseTexture);
 
             if(!graphic) return null;
         }

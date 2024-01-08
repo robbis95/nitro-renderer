@@ -1,14 +1,12 @@
-import { Point, Rectangle, RenderTexture, Texture } from '@pixi/core';
-import { Container, DisplayObject } from '@pixi/display';
-import { Sprite } from '@pixi/sprite';
+import { Container, Point, Rectangle, Sprite, Texture } from 'pixi.js';
 import { IGetImageListener, IImageResult, IObjectData, IRoomEngine, IRoomObjectController, IRoomRenderingCanvas, IVector3D, LegacyDataType, RoomObjectCategory, RoomObjectUserType, RoomObjectVariable, Vector3d } from '../../../api';
+import { GetTickerTime } from '../../../common';
 import { NitroEventDispatcher, RoomEngineEvent, RoomEngineObjectEvent } from '../../../events';
-import { GetTickerTime, NitroSprite } from '../../../pixi-proxy';
-import { RoomId } from '../../../room';
 import { FloorHeightMapMessageParser, RoomEntryTileMessageParser } from '../../communication';
 import { RoomEngine } from '../RoomEngine';
 import { ObjectRoomMapUpdateMessage } from '../messages';
 import { RoomPlaneParser } from '../object/RoomPlaneParser';
+import { RoomId } from '../utils';
 import { LegacyWallGeometry } from '../utils/LegacyWallGeometry';
 
 export class RoomPreviewer
@@ -430,7 +428,7 @@ export class RoomPreviewer
         }
     }
 
-    public getRoomCanvas(width: number, height: number): DisplayObject
+    public getRoomCanvas(width: number, height: number): Container
     {
         if(this.isRoomEngineReady)
         {
@@ -442,7 +440,7 @@ export class RoomPreviewer
 
                 if(!backgroundSprite)
                 {
-                    backgroundSprite = new NitroSprite(Texture.WHITE);
+                    backgroundSprite = new Sprite(Texture.WHITE);
 
                     displayObject.addChildAt(backgroundSprite, 0);
                 }
@@ -725,16 +723,6 @@ export class RoomPreviewer
         }
     }
 
-    public set disableUpdate(flag: boolean)
-    {
-        this._disableUpdate = flag;
-    }
-
-    public set disableRoomEngineUpdate(flag: boolean)
-    {
-        if(this.isRoomEngineReady) this._roomEngine.disableUpdate(flag);
-    }
-
     private onRoomInitializedonRoomInitialized(event: RoomEngineEvent): void
     {
         if(!event) return;
@@ -774,7 +762,7 @@ export class RoomPreviewer
 
     public updateRoomEngine(): void
     {
-        if(this.isRoomEngineReady) this._roomEngine.runUpdate();
+        if(this.isRoomEngineReady) this._roomEngine.update();
     }
 
     public getRenderingCanvas(): IRoomRenderingCanvas
@@ -806,13 +794,13 @@ export class RoomPreviewer
         return null;
     }
 
-    public getRoomObjectCurrentImage(): RenderTexture
+    public getRoomObjectCurrentImage(): Texture
     {
         if(this.isRoomEngineReady)
         {
             const roomObject = this._roomEngine.getRoomObject(this._previewRoomId, RoomPreviewer.PREVIEW_OBJECT_ID, this._currentPreviewObjectCategory);
 
-            if(roomObject && roomObject.visualization) return roomObject.visualization.getImage(0xFFFFFF, -1);
+            if(roomObject && roomObject.visualization) return roomObject.visualization.getObjectAsTexture();
         }
 
         return null;

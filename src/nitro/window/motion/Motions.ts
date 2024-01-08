@@ -1,4 +1,4 @@
-﻿import { GetTickerFPS, GetTickerTime } from '../../../pixi-proxy';
+﻿import { GetTickerFPS, GetTickerTime } from '../../../common';
 import { Motion } from './Motion';
 
 export class Motions

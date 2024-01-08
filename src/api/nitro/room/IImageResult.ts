@@ -1,9 +1,9 @@
-import { RenderTexture } from '@pixi/core';
+import { Texture } from 'pixi.js';
 
 export interface IImageResult
 {
     id: number;
-    data: RenderTexture;
+    data: Texture;
     image: HTMLImageElement;
     getImage(): Promise<HTMLImageElement>;
 }

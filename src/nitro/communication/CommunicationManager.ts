@@ -1,6 +1,6 @@
 import { ICommunicationManager, IConnection, IMessageConfiguration, IMessageEvent, NitroConfiguration } from '../../api';
+import { GetTickerTime } from '../../common';
 import { NitroEventDispatcher, NitroEventType } from '../../events';
-import { GetTickerTime } from '../../pixi-proxy';
 import { NitroMessages } from './NitroMessages';
 import { SocketConnection } from './SocketConnection';
 import { AuthenticatedEvent, ClientHelloMessageComposer, ClientPingEvent, InfoRetrieveMessageComposer, PongMessageComposer, SSOTicketMessageComposer } from './messages';

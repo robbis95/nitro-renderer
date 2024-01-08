@@ -1,5 +1,5 @@
+import { BLEND_MODES } from 'pixi.js';
 import { IAssetColor, IAssetVisualizationDirection, IAssetVisualizationLayer } from '../../../../../api';
-import { SpriteUtilities } from '../../../../../room';
 import { ColorData } from './ColorData';
 import { DirectionData } from './DirectionData';
 import { LayerData } from './LayerData';
@@ -144,7 +144,12 @@ export class SizeData
 
             if(layerId < 0 || (layerId >= this._layerCount)) return false;
 
-            if(layer.ink !== undefined) directionData.setLayerInk(layerId, SpriteUtilities.inkToBlendMode(layer.ink));
+            if(layer.ink !== undefined)
+            {
+                console.log(layer.ink);
+
+                directionData.setLayerBlendMode(layerId, layer.ink as BLEND_MODES);
+            }
 
             if(layer.tag !== undefined) directionData.setLayerTag(layerId, layer.tag);
 
@@ -214,13 +219,13 @@ export class SizeData
         return directionData.getLayerTag(layerId);
     }
 
-    public getLayerInk(direction: number, layerId: number): number
+    public getLayerBlendMode(direction: number, layerId: number): BLEND_MODES
     {
         const directionData = this.getDirectionData(direction);
 
-        if(!directionData) return LayerData.DEFAULT_INK;
+        if(!directionData) return LayerData.DEFAULT_BLEND_MODE;
 
-        return directionData.getLayerInk(layerId);
+        return directionData.getLayerBlendMode(layerId);
     }
 
     public getLayerAlpha(direction: number, layerId: number): number
